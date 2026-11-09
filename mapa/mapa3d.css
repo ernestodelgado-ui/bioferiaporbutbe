@@ -1,0 +1,97 @@
+/* =========================================================
+   MAPA 3D · botón de entrada y pantalla inmersiva (siempre oscura)
+   ========================================================= */
+.m3-open {
+  display: inline-flex; align-items: center; gap: .6em; justify-self: start; min-height: 52px; padding: 0 clamp(26px, 3vw, 38px); border-radius: 999px; cursor: pointer; margin-left: 10px;
+  color: #fff; border: 1.5px solid #FFFFFFD9; font: 400 1.1rem "Inter", system-ui, sans-serif; letter-spacing: -.01em; text-shadow: 0 1px 10px #8A005E99;
+  background: radial-gradient(circle at 30% 22%, #FFFFFFB3 0%, #FF4DC4B3 30%, #FF00B2D9 70%, #D6008FE6 100%); box-shadow: 0 20px 50px -16px #FF00B2, inset 0 2px 0 #FFFFFFB3, inset 0 -10px 20px #B3007A55;
+  transition: transform .2s, filter .2s;
+}
+.m3-open i { font-style: normal; transition: transform .2s; }
+.m3-open:hover { transform: translateY(-2px); filter: brightness(1.1); } .m3-open:hover i { transform: translateX(4px); }
+.m3-open:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+@media (max-width: 640px) { .m3-open { margin: 10px 0 0; } }
+
+html.m3-lock { overflow: hidden; }
+.m3 { position: fixed; inset: 0; z-index: 3500; background: #03060f; color: #fff; font-family: "Inter", system-ui, sans-serif; overflow: hidden; touch-action: none; }
+.m3[hidden] { display: none; }
+.m3__cv { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; outline: none; }
+.m3__cv:active { cursor: grabbing; }
+.m3__pins { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+
+/* puntos sobre el terreno */
+.m3__pin { position: absolute; left: 0; top: 0; display: grid; justify-items: center; gap: 4px; padding: 0; border: 0; background: none; color: #fff; cursor: pointer; pointer-events: auto; font: inherit; will-change: transform; }
+.m3__pin span { padding: 1px 12px; border-radius: 999px; background: #0B1226B3; border: 1px solid #FFFFFF59; -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); font-size: .8rem; letter-spacing: -.01em; white-space: nowrap; transition: transform .2s, opacity .2s; }
+.m3__pin i { width: 12px; height: 12px; border-radius: 50%; background: var(--c); box-shadow: 0 0 0 4px #FFFFFF26, 0 0 18px 4px var(--c); }
+.m3__pin.is-big span { font-size: .95rem; padding: 2px 14px; }
+.m3__pin.is-far span { opacity: 0; transform: scale(.7); pointer-events: none; }
+.m3__pin:hover span, .m3__pin.is-on span { opacity: 1; transform: none; background: var(--c); color: #0B0B0B; border-color: #fff; }
+.m3__pin:focus-visible { outline: 3px solid #fff; outline-offset: 3px; border-radius: 12px; }
+
+/* encabezado y ayuda */
+.m3__top { position: absolute; z-index: 5; left: 0; right: 0; top: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 0 max(16px, env(safe-area-inset-left, 0px)); pointer-events: none; }
+.m3__ttl { margin: 0; padding: 4px 18px; border-radius: 999px; background: #FFFFFF1F; border: 1px solid #FFFFFF4D; -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); font-weight: 300; letter-spacing: -.03em; font-size: 1.05rem; }
+.m3__ttl b { font-weight: 700; color: #FF00B2; }
+.m3__close, .m3__x2, .m3__vuelta { pointer-events: auto; border-radius: 999px; cursor: pointer; color: #fff; font: 400 .9rem "Inter", system-ui, sans-serif; background: #FFFFFF26; border: 1px solid #FFFFFF59; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); transition: background .2s; }
+.m3__close { min-height: 40px; padding: 0 18px; }
+.m3__close:hover, .m3__x2:hover, .m3__vuelta:hover { background: #FFFFFF40; }
+.m3__close:focus-visible, .m3__x2:focus-visible, .m3__vuelta:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.m3__hint { position: absolute; z-index: 5; left: 50%; bottom: max(18px, env(safe-area-inset-bottom, 0px)); translate: -50% 0; margin: 0; width: max-content; max-width: calc(100% - 32px); text-align: center; padding: 4px 16px; border-radius: 999px; background: #0B122699; border: 1px solid #FFFFFF33; font-size: .8rem; color: #FFFFFFCC; pointer-events: none; }
+
+/* ficha del lugar */
+.m3__info { position: absolute; z-index: 6; left: max(16px, env(safe-area-inset-left, 0px)); bottom: max(58px, calc(env(safe-area-inset-bottom, 0px) + 46px)); width: min(340px, calc(100% - 32px)); padding: 18px 20px 20px; border-radius: 26px; background: linear-gradient(160deg, #FFFFFF2B, #FFFFFF0F 60%, #FFFFFF1C); border: 1px solid #FFFFFF59; -webkit-backdrop-filter: blur(18px) saturate(1.4); backdrop-filter: blur(18px) saturate(1.4); box-shadow: 0 30px 60px -28px #000, inset 0 1px 0 #FFFFFF59; }
+.m3__info[hidden] { display: none; }
+.m3__x2 { position: absolute; right: 12px; top: 12px; width: 34px; height: 34px; padding: 0; font-size: 1.3rem; line-height: 1; }
+.m3__tag { margin: 0 0 6px; display: inline-block; padding: 1px 12px; border-radius: 999px; background: var(--c); color: #0B0B0B; font-size: .78rem; letter-spacing: .02em; text-transform: uppercase; }
+.m3__info h3 { margin: 0 0 8px; font-weight: 300; font-size: 2rem; line-height: 1; letter-spacing: -.06em; }
+.m3__lbl { margin: 0 0 4px; font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: #FFFFFFB3; }
+.m3__info ul { list-style: none; margin: 0 0 12px; padding: 0; display: grid; gap: 2px; }
+.m3__info li { font-size: .98rem; letter-spacing: -.01em; } .m3__info li b { margin-right: .6em; color: var(--c); font-weight: 600; }
+.m3__nota { margin: 0 0 12px; font-size: .98rem; color: #FFFFFFD9; }
+.m3__vuelta { min-height: 38px; padding: 0 16px; }
+.m3__load { position: absolute; inset: 0; z-index: 7; display: grid; place-items: center; background: #03060f; font-weight: 300; letter-spacing: -.02em; font-size: 1.3rem; color: #FFFFFFB3; }
+.m3__load[hidden] { display: none; }
+html.menos-movimiento .m3 * { transition: none !important; }
+@media (max-width: 640px) { .m3__hint { font-size: .72rem; } .m3__info { width: calc(100% - 32px); bottom: max(54px, calc(env(safe-area-inset-bottom, 0px) + 44px)); } .m3__info h3 { font-size: 1.6rem; } }
+
+/* selector Real / Líneas */
+.m3__modo { pointer-events: auto; display: inline-flex; padding: 3px; border-radius: 999px; background: #FFFFFF26; border: 1px solid #FFFFFF59; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+.m3__modo button { min-height: 32px; padding: 0 16px; border: 0; border-radius: 999px; background: none; color: #fff; font: 400 .9rem "Inter", system-ui, sans-serif; cursor: pointer; }
+.m3__modo button[aria-pressed="true"] { background: #FF00B2; }
+.m3__modo button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.m3.is-real .m3__ttl, .m3.is-real .m3__close, .m3.is-real .m3__modo { background: #0B122659; }
+.m3.is-real .m3__modo button[aria-pressed="true"] { background: #FF00B2; }
+.m3.is-real .m3__pin span { background: #FFFFFFE6; color: #0B1226; border-color: #FFFFFF; }
+.m3.is-real .m3__pin i { box-shadow: 0 0 0 4px #FFFFFFB3, 0 4px 10px #00000055; }
+.m3.is-real .m3__hint { background: #0B122680; }
+@media (max-width: 640px) { .m3__modo button { padding: 0 11px; font-size: .82rem; } .m3__ttl { display: none; } }
+
+/* el mapa 2D sale: la tarjeta del mapa muestra el 3D y se abre al tocarla */
+.areas__mapbtn { position: relative; cursor: pointer; }
+.areas__mapbtn .mpin { display: none !important; }
+.areas__mapfoot > .btn { display: none !important; }
+.areas__mapbtn::after { content: "Tocá para recorrerlo en 3D"; position: absolute; left: 50%; bottom: 7%; translate: -50% 0; padding: 4px 18px; border-radius: 999px; background: #FFFFFFE6; color: #0B0B0B; font: 400 .95rem "Inter", system-ui, sans-serif; box-shadow: 0 10px 24px -8px #0000004D; pointer-events: none; }
+.m3-open { margin-left: 0; }
+.m3__ttl { background: #0B122680 !important; }
+.m3.is-real .m3__info { background: linear-gradient(160deg, #0B1226F0, #0B1226D9); }
+
+/* ficha con el render del lugar */
+.m3__foto { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 16px; margin: 0 0 12px; border: 1px solid #FFFFFF40; box-shadow: 0 14px 30px -14px #000; }
+.m3__info { width: min(340px, calc(100% - 32px)); max-height: calc(100% - 120px); overflow: auto; }
+@media (max-width: 640px) { .m3__foto { aspect-ratio: 16 / 8; } }
+
+/* botón día / noche (reemplaza al selector Líneas / Real) */
+.m3__tema { pointer-events: auto; width: 40px; height: 40px; display: grid; place-items: center; padding: 0; border-radius: 50%; cursor: pointer; color: #fff; background: #0B122659; border: 1px solid #FFFFFF59; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); margin-left: auto; margin-right: 10px; }
+.m3__tema .luna { display: none; } .m3.is-night .m3__tema .sol { display: none; } .m3.is-night .m3__tema .luna { display: block; }
+.m3__tema:hover { background: #0B122680; } .m3__tema:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.m3.is-night .m3__pin span { background: #0B1226E6; color: #fff; border-color: #FFFFFF73; }
+.m3.is-night .m3__pin i { box-shadow: 0 0 0 4px #FFFFFF40, 0 0 16px 4px var(--c); }
+.m3.is-night .m3__hint, .m3.is-night .m3__ttl, .m3.is-night .m3__close { background: #0B122699; }
+.m3__info { background: linear-gradient(160deg, #0B1226F2, #0B1226DB) !important; }
+
+/* botón Personas (mostrar / ocultar) */
+.m3__gente { pointer-events: auto; height: 40px; display: inline-flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 999px; cursor: pointer; color: #fff; background: #0B122659; border: 1px solid #FFFFFF59; -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); font: 400 .9rem "Inter", system-ui, sans-serif; margin-left: auto; margin-right: 10px; }
+.m3__gente + .m3__tema { margin-left: 0; }
+.m3__gente[aria-pressed="true"] { background: #FF00B2; border-color: #fff; }
+.m3__gente:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+@media (max-width: 640px) { .m3__gente span { display: none; } .m3__gente { padding: 0 11px; } }
