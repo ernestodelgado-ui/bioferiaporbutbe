@@ -1913,9 +1913,9 @@ function onMapBuilt(){const M=window.M3;
   setTimeout(()=>{const x=document.querySelector('.m3__close');if(x)x.click();const o=document.querySelector('.m3');if(o){o.hidden=true;o.style.display='none'}},1800)}
 function loadMapa(){
   const foot=document.createElement('div');foot.className='areas__mapfoot';foot.style.display='none';document.body.appendChild(foot);
-  const css=document.createElement('link');css.rel='stylesheet';css.href='mapa/mapa3d.css';document.head.appendChild(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='mapa/mapa3d.css?v=3';document.head.appendChild(css);
   const ld=src=>new Promise(r=>{const e=document.createElement('script');e.src=src;e.async=false;e.onload=r;e.onerror=r;document.body.appendChild(e)});
-  ld('mapa/content.js').then(()=>ld('mapa/mapa3d.js')).then(()=>ld('mapa/mapa3d-real.js')).then(()=>{
+  ld('mapa/content.js?v=3').then(()=>ld('mapa/mapa3d.js?v=3')).then(()=>ld('mapa/mapa3d-real.js?v=3')).then(()=>{
     document.addEventListener('m3-built',onMapBuilt,{once:true});const b=document.querySelector('.m3-open');if(b)b.click()})}
 function hitPin(e){if(!mapReady||!pinGroup.visible)return null;
   const r=cv.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(ndc,camera);
@@ -2278,6 +2278,10 @@ addEventListener('keydown',e=>{if(DESC.mode!=='scroll')return;const nx=['ArrowDo
   if(nx.includes(e.key)&&DESC.mktNext()){e.preventDefault();e.stopImmediatePropagation();return}
   if(['ArrowDown','PageDown','ArrowRight',' ','ArrowUp','PageUp','ArrowLeft'].includes(e.key)&&DESC.apAny()){e.preventDefault();e.stopImmediatePropagation();DESC.closeAll()}},true);
 cv.addEventListener('pointerup',e=>{if(DESC.mode==='scroll'&&DESC.mktNext())e.stopImmediatePropagation()},true);
+/* marketing y redes: las pantallas quedan quietas, el mouse no mueve la cámara (así se puede entrar sin querer) */
+DESC.inMkt=()=>DESC.mode==='scroll'&&!!ST[cur]&&ST[cur].id==='marketing';
+cv.addEventListener('pointermove',e=>{if(DESC.inMkt())e.stopImmediatePropagation()},true);
+
 let pdn=null;cv.addEventListener('pointerdown',e=>{pdn={x:e.clientX,y:e.clientY,t:performance.now()}});
 cv.addEventListener('pointerup',e=>{if(DESC.mode!=='scroll'||!pdn)return;const m=Math.hypot(e.clientX-pdn.x,e.clientY-pdn.y),dtp=performance.now()-pdn.t;pdn=null;if(m<7&&dtp<500&&snapI<SCR_N-1&&cur===seedIdx)snapTo(snapI+1)});/* un clic = la imagen que sigue */
 /* ---------- elementos de Catálisis: uno por estación ---------- */
@@ -2405,6 +2409,7 @@ ticks.push(t=>{
   /* vida: la semilla sigue a la cámara con resorte (se balancea), respira, da un saltito al cambiar de estación, se inclina con el scroll y mira hacia el mouse */
   const dtL=Math.min(.05,Math.max(.001,t-(DESC.lt2||t)));DESC.lt2=t;
   const apOpen=DESC.mode==='scroll'&&((!!ST[cur]&&ST[cur].id==='editorial'&&edAny>.15)||igOpen||ytOpen||tkOpen||mvOpen||(window.__picOpen&&window.__picOpen())||document.body.classList.contains('mapinfo')||U.r<.88||['pz','fw','jg','jq','wv','pv'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('on')}));
+  if(DESC.inMkt()){U.th=0;U.ph=0;U.f.set(0,0,0)}
   $d('apx').style.display=(DESC.mode==='scroll'&&DESC.apAny()&&!['pv','jg','jq','fin'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('on')}))?'flex':'none';
   DESC.apK=(DESC.apK||0)+((apOpen?1:0)-(DESC.apK||0))*Math.min(1,dtL*5);
   if(!DESC.lifeOn||DESC.mode==='born'||DESC.mode==='return'||DESC.mode==='unborn'){lifeP.copy(_p);lifeV.set(0,0,0);DESC.lifeOn=true}
