@@ -97,5 +97,5 @@ html.menos-movimiento .m3 * { transition: none !important; }
 @media (max-width: 640px) { .m3__gente span { display: none; } .m3__gente { padding: 0 11px; } }
 
 /* texto blanco sobre fondo rojo y azul */
-.m3__pin[data-c="rojo"] span, .m3__pin[data-c="azul"] span, .m3__pin[data-c="rojo"]:hover span, .m3__pin[data-c="azul"]:hover span, .m3__pin[data-c="rojo"].is-on span, .m3__pin[data-c="azul"].is-on span { color: #fff; }
-.m3__info[data-c="rojo"] .m3__tag, .m3__info[data-c="azul"] .m3__tag { color: #fff; }
+.m3__pin[data-c="rojo"] span, .m3__pin[data-c="azul"] span, .m3__pin[data-c="rosa"] span, .m3__pin[data-c="rojo"]:hover span, .m3__pin[data-c="azul"]:hover span, .m3__pin[data-c="rosa"]:hover span, .m3__pin[data-c="rojo"].is-on span, .m3__pin[data-c="azul"].is-on span, .m3__pin[data-c="rosa"].is-on span { color: #fff; }
+.m3__info[data-c="rojo"] .m3__tag, .m3__info[data-c="azul"] .m3__tag, .m3__info[data-c="rosa"] .m3__tag { color: #fff; }

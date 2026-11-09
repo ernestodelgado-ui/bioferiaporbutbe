@@ -1882,7 +1882,7 @@ let mapMode='sec';const pinIcoTex={};
 function icoTex(n){if(pinIcoTex[n])return pinIcoTex[n];const o={tex:null,asp:.85};pinIcoTex[n]=o;const im=new Image();im.onload=()=>{const t=new THREE.Texture(im);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;t.needsUpdate=true;o.tex=t;o.asp=im.width/im.height;o.subs.forEach(f=>f())};o.subs=[];im.src='assets/mapa-pins/n'+n+'.png';return o}
 function pillColored(text,world,col){const c=canvas(8,8),x=c.getContext('2d'),f='600 46px Inter,sans-serif';x.font=f;const w=Math.ceil(x.measureText(text).width+60),h=82;c.width=w;c.height=h;
   x.fillStyle=col;x.beginPath();x.moveTo(h/2,2);x.arcTo(w-2,2,w-2,h-2,h/2-2);x.arcTo(w-2,h-2,2,h-2,h/2-2);x.arcTo(2,h-2,2,2,h/2-2);x.arcTo(2,2,w-2,2,h/2-2);x.fill();
-  x.font=f;x.fillStyle=/^#(FA3710|005BFC|4C8BFF)$/i.test(col)?'#fff':'#111';x.textBaseline='middle';x.textAlign='center';x.fillText(text,w/2,h/2+2);
+  x.font=f;x.fillStyle=/^#(FA3710|005BFC|4C8BFF|FF00B2)$/i.test(col)?'#fff':'#111';x.textBaseline='middle';x.textAlign='center';x.fillText(text,w/2,h/2+2);
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:mkTex(c),transparent:true,depthTest:false,depthWrite:false}));sp.scale.set(w/h*world,world,1);sp.renderOrder=10;return sp}
 function pinColors(){const out={};mapPD.forEach(d=>{const sec=PIN_SEC[d.p.id];if(sec)out[d.p.id]=SECCOL[sec]});
   mapPD.forEach(d=>{if(out[d.p.id])return;/* sin sector: toma el color de la luz más cercana */let best=null,bd=1e9;mapPD.forEach(e=>{if(!PIN_SEC[e.p.id])return;const dd=(d.v.x-e.v.x)**2+(d.v.z-e.v.z)**2;if(dd<bd){bd=dd;best=e}});out[d.p.id]=best?SECCOL[PIN_SEC[best.p.id]]:M3.CSS[d.p.c]});return out}
@@ -1913,9 +1913,9 @@ function onMapBuilt(){const M=window.M3;
   setTimeout(()=>{const x=document.querySelector('.m3__close');if(x)x.click();const o=document.querySelector('.m3');if(o){o.hidden=true;o.style.display='none'}},1800)}
 function loadMapa(){
   const foot=document.createElement('div');foot.className='areas__mapfoot';foot.style.display='none';document.body.appendChild(foot);
-  const css=document.createElement('link');css.rel='stylesheet';css.href='mapa/mapa3d.css?v=3';document.head.appendChild(css);
+  const css=document.createElement('link');css.rel='stylesheet';css.href='mapa/mapa3d.css?v=4';document.head.appendChild(css);
   const ld=src=>new Promise(r=>{const e=document.createElement('script');e.src=src;e.async=false;e.onload=r;e.onerror=r;document.body.appendChild(e)});
-  ld('mapa/content.js?v=3').then(()=>ld('mapa/mapa3d.js?v=3')).then(()=>ld('mapa/mapa3d-real.js?v=3')).then(()=>{
+  ld('mapa/content.js?v=4').then(()=>ld('mapa/mapa3d.js?v=4')).then(()=>ld('mapa/mapa3d-real.js?v=4')).then(()=>{
     document.addEventListener('m3-built',onMapBuilt,{once:true});const b=document.querySelector('.m3-open');if(b)b.click()})}
 function hitPin(e){if(!mapReady||!pinGroup.visible)return null;
   const r=cv.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(ndc,camera);
