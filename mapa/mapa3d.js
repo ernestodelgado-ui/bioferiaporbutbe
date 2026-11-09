@@ -269,7 +269,7 @@
     pinsData = PINS.map((p) => { const x = wx(p.p[0]), z = wz(p.p[1]); return { p, v: new THREE.Vector3(x, hAt(x, z) + 4.2, z), g: new THREE.Vector3(x, hAt(x, z), z) }; });
     const pinBox = ov.querySelector(".m3__pins");
     pinEls = pinsData.map((d) => {
-      const b = document.createElement("button"); b.type = "button"; b.className = "m3__pin" + (d.p.big ? " is-big" : ""); b.style.setProperty("--c", CSS[d.p.c]);
+      const b = document.createElement("button"); b.type = "button"; b.className = "m3__pin" + (d.p.big ? " is-big" : ""); b.style.setProperty("--c", CSS[d.p.c]); b.dataset.c = d.p.c;
       b.innerHTML = `<i></i><span>${esc(d.p.n)}</span>`; b.setAttribute("aria-label", d.p.n); b.addEventListener("click", () => select(d)); pinBox.appendChild(b); return b;
     });
     window.M3 = { cam, THREE, scene, camera, renderer, LG, hAt, wx, wz, UW, UH, PINS, pinsData, animObjs, img, t, CSS, COLOR, ov, coarse: matchMedia("(pointer: coarse)").matches || innerWidth < 720 };
@@ -282,7 +282,7 @@
   function select(d) {
     sel = d; cam.auto = false; cam.fly = { t: 0, from: { tx: cam.ttx, tz: cam.ttz, tr: cam.tr, tph: cam.tph }, to: { tx: d.g.x, tz: d.g.z, tr: 30, tph: .95 } };
     const p = d.p, cs = catsDe(p);
-    ui.info.hidden = false; ui.info.style.setProperty("--c", CSS[p.c]);
+    ui.info.hidden = false; ui.info.style.setProperty("--c", CSS[p.c]); ui.info.dataset.c = p.c;
     ui.info.innerHTML = `<button type="button" class="m3__x2" aria-label="Cerrar información">×</button>${FOTO[p.id] ? `<img class="m3__foto" src="assets/mapa3d/${FOTO[p.id]}.jpg" alt="Render de ${esc(p.n)}" draggable="false">` : ""}<p class="m3__tag">${esc(VERBO[p.c])}</p><h3>${esc(p.n)}</h3>` +
       (cs.length ? `<p class="m3__lbl">Categorías que viven acá</p><ul>${cs.map((c) => `<li><b>${String(c.i).padStart(2, "0")}</b>${esc(c.n)}</li>`).join("")}</ul>` : `<p class="m3__nota">${esc(p.nota || "")}</p>`) +
       `<button type="button" class="m3__vuelta">Volver a la vista general</button>`;

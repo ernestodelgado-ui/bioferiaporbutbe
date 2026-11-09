@@ -275,9 +275,9 @@
   #intro,#start,#tvskip{display:none!important}
   #oflash{position:fixed;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;z-index:60;pointer-events:none;opacity:0;background:#fff;box-shadow:0 0 22px 8px rgba(255,255,255,.95),0 0 80px 26px rgba(255,255,255,.45);transform:scale(1);transition:opacity .4s ease-out,transform .4s ease-in}
   #oflash.on{opacity:1;transition:opacity .08s}
-  #apx{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:58;display:none;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(10,10,13,.72);color:#F2F2EE;font:500 11px 'Inter',sans-serif;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(8px)}
+  #apx{position:fixed;right:18px;top:16px;z-index:58;display:none;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(10,10,13,.72);color:#F2F2EE;font:500 11px 'Inter',sans-serif;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(8px)}
   html[data-theme=light] #apx{background:rgba(255,255,255,.86);color:#16161A;border-color:rgba(22,22,26,.35)}
-  #apx:hover{transform:translateX(-50%) scale(1.04)}
+  #apx:hover{transform:scale(1.04)}
   #ohint{position:fixed;left:50%;bottom:34px;transform:translateX(-50%);z-index:12;pointer-events:none;font:400 11px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.34em;color:rgba(255,255,255,.62);opacity:0;transition:opacity .6s;text-align:center;white-space:nowrap}
   body.open #brand,body.open #uni,body.open #nav,body.open #dots,body.open #thm{opacity:0!important;pointer-events:none!important}
   @media(max-width:700px){#stg,#elchip{left:16px}#dp{right:16px}}
@@ -1135,10 +1135,10 @@ station({id:'marketing',az:D(202),R:27,y:1.4,title:'Marketing y redes',text:'Ins
   const sim=new Image();sim.onload=()=>{const x=sx,pad=60,w=SW-pad*2,h=Math.round(w*526/2000),r=40,y0=(SH-h)/2-10;x.clearRect(0,0,SW,SH);x.save();x.shadowColor='rgba(20,20,30,.38)';x.shadowBlur=48;x.shadowOffsetY=20;x.fillStyle='#fff';x.beginPath();x.moveTo(pad+r,y0);x.arcTo(pad+w,y0,pad+w,y0+h,r);x.arcTo(pad+w,y0+h,pad,y0+h,r);x.arcTo(pad,y0+h,pad,y0,r);x.arcTo(pad,y0,pad+w,y0,r);x.closePath();x.fill();x.restore();x.save();x.clip();x.drawImage(sim,pad,y0,w,h);x.restore();strTex.needsUpdate=true};sim.src='assets/redes/estrategia.jpg';
   const strM=new THREE.Mesh(new THREE.PlaneGeometry(15.5,15.5*SH/SW),new THREE.MeshBasicMaterial({map:strTex,transparent:true,opacity:1,depthWrite:false,side:THREE.DoubleSide,toneMapped:false,fog:false}));strM.position.set(0,-.4,.4);strM.renderOrder=6;g.add(strM);
   let strEn=null,strHere=false,strK=0,rowK=0;
-  ticks.push(()=>{const here=cur>=0&&!!ST[cur]&&ST[cur].id==='marketing';if(here&&!strHere)mktStage=0;strHere=here;
-    strK+=((here&&mktStage===0?1:0)-strK)*.05;const k=strK*strK*(3-2*strK);strM.visible=k>.01;
+  ticks.push(tN=>{const dtm=Math.min(.12,Math.max(.001,tN-(window.__rl||tN)));window.__rl=tN;window.__dtm=dtm;const here=cur>=0&&!!ST[cur]&&ST[cur].id==='marketing';if(here&&!strHere)mktStage=0;strHere=here;
+    strK+=((here&&mktStage===0?1:0)-strK)*(1-Math.exp(-dtm*3.4));const k=strK*strK*(3-2*strK);strM.visible=k>.01;
     if(!strEn){const d=ST.find(q=>q.id==='marketing');strEn=d&&d.mats&&d.mats.find(e=>e[0]===strM.material)}if(strEn)strEn[1]=k;else strM.material.opacity=k;
-    mvP+=((mvOpen?1:0)-mvP)*.06;if(Math.abs(mvP-(mvOpen?1:0))<.003)mvP=mvOpen?1:0;{const wantRow=mktStage>=1||ytOpen||igOpen||tkOpen||mvOpen;rowK+=((wantRow?1:0)-rowK)*.07;rowG.visible=rowK>.02;rowG.scale.setScalar(.7+.3*rowK)}})
+    mvP+=((mvOpen?1:0)-mvP)*.06;if(Math.abs(mvP-(mvOpen?1:0))<.003)mvP=mvOpen?1:0;{const wantRow=mktStage>=1||ytOpen||igOpen||tkOpen||mvOpen;rowK+=((wantRow?1:0)-rowK)*(1-Math.exp(-dtm*8));rowG.visible=rowK>.02;rowG.scale.setScalar(.7+.3*rowK)}})
   /* feed de Instagram: 9 piezas en grilla 3x3 + logo, sin fondo, flotando en el espacio */
   const igG=new THREE.Group();igG.visible=false;g.add(igG);
   const IGF=['instagram/01.png','instagram2/p130.png','instagram2/p129.png','instagram/07.webp','instagram/04.webp','instagram2/p140.png','instagram/02.webp','instagram/05.webp','instagram2/p133.png','instagram/09.webp','instagram/08.png','instagram2/p142.png','instagram2/p136.png','instagram/03.webp','instagram2/p137.png','instagram2/p138.png','instagram2/p143.png','instagram/06.webp'];/* los que existen en alta calidad usan esa; el resto son las miniaturas enviadas */
@@ -1805,7 +1805,7 @@ function frame(){
   elems.rotation.y=Math.sin(tNow*.12)*.35;
   ticks.forEach(f=>f(tNow));
   applyDim(sd);const k2=1-Math.exp(-dt*2.2),allView=ST[cur]&&ST[cur].id==='all';
-  ST.forEach((s,i)=>{if(!s.g)return;const hideEd=s.id==='editorial'&&cur>=0&&!!ST[cur]&&(ST[cur].id==='pictos'||ST[cur].id==='graficas'||ST[cur].id==='senaletica'),focusOn=cur>=0&&!!ST[cur]&&((ST[cur].id==='editorial'&&edAny>.15)||(ST[cur].id==='marketing'&&(igOpen||ytOpen||tkOpen||mvOpen))),tg=(window.__DESC&&window.__DESC.on&&!allView)?(((hideEd||focusOn)&&cur!==i)?0:window.__DESC.tgt(i)):(allView||cur===i)?1:((hideEd||focusOn)?0:(window.__DESC&&window.__DESC.on?window.__DESC.ghost(i):((s.id==='app'||s.id==='juego')?.1:.14)));s.vis=(s.vis===undefined?1:s.vis)+(tg-(s.vis===undefined?1:s.vis))*(window.__DESC&&window.__DESC.on?((tg<(s.vis===undefined?1:s.vis))?Math.min(1,k2*14):Math.min(1,k2*3.5)):k2);
+  ST.forEach((s,i)=>{if(!s.g)return;const hideEd=s.id==='editorial'&&cur>=0&&!!ST[cur]&&(ST[cur].id==='pictos'||ST[cur].id==='graficas'||ST[cur].id==='senaletica'),focusOn=cur>=0&&!!ST[cur]&&((ST[cur].id==='editorial'&&edAny>.15)||(ST[cur].id==='marketing'&&(igOpen||ytOpen||tkOpen||mvOpen))),tg=(window.__DESC&&window.__DESC.on&&!allView)?(((hideEd||focusOn)&&cur!==i)?0:window.__DESC.tgt(i)):(allView||cur===i)?1:((hideEd||focusOn)?0:(window.__DESC&&window.__DESC.on?window.__DESC.ghost(i):((s.id==='app'||s.id==='juego')?.1:.14)));s.vis=(s.vis===undefined?1:s.vis)+(tg-(s.vis===undefined?1:s.vis))*(window.__DESC&&window.__DESC.on?((tg<(s.vis===undefined?1:s.vis))?Math.min(1,k2*14):Math.min(1,k2*9)):k2);
     const p=s.id==='agencia'?(started?eo((tNow-startAt)/1.2):0):(revealAt>=0?eo((tNow-revealAt-i*.12)/.9):0);
     s.g.visible=p>0&&s.vis>.03;s.g.scale.setScalar(Math.max(.001,p));if(s.g.visible)s.mats.forEach(([m,o])=>m.opacity=o*s.vis)});
   /* cámara */
@@ -2240,7 +2240,7 @@ DESC.cam=function(){
 /* solo se insinúa lo que está lejos y adelante; lo cercano o ya pasado no se ve (así nunca se superpone con lo actual) */
 DESC.ghost=i=>{const dd=i-DESC.wI;if(dd<=0)return 0;const u=clamp((dd-1.1)/.7,0,1);return .22*u*u*(3-2*u)*clamp(1-(dd-2)/1.4,0,1)};
 /* opacidad de cada estación según la posición continua de la cámara: la que sale se apaga rápido y la que llega aparece recién al acercarse (nunca dos estaciones lavadas superpuestas) */
-DESC.tgt=i=>{const d=Math.abs(i-(DESC.wI||0)),m=clamp(1-(d-.08)/.2,0,1);return Math.max(m*m*(3-2*m),DESC.ghost(i)*.8*(1-m))};
+DESC.tgt=i=>{const dd=i-(DESC.wI||0),d=Math.abs(dd),m=clamp(1-(d-.2)/.13,0,1);return Math.max(m*m*(3-2*m),(dd>-.6&&dd<1.6)?.031:0)};
 DESC.mapZoom=e=>!!ST[cur]&&ST[cur].id==='espacios'&&e.clientY>innerHeight*.28&&e.clientY<innerHeight*.92&&!(e.deltaY>0&&U.r>=.999);/* rueda sobre el mapa: acerca */
 DESC.canBorn=()=>DESC.mode==='intro';
 function sizeSpacer(){$d('spacer').style.height=(DESC.mode==='scroll'?(EXTRA+NSC)*100*(innerWidth<innerHeight*.8?1.25:1.1)+'vh':'0')}
@@ -2405,7 +2405,7 @@ ticks.push(t=>{
   /* vida: la semilla sigue a la cámara con resorte (se balancea), respira, da un saltito al cambiar de estación, se inclina con el scroll y mira hacia el mouse */
   const dtL=Math.min(.05,Math.max(.001,t-(DESC.lt2||t)));DESC.lt2=t;
   const apOpen=DESC.mode==='scroll'&&((!!ST[cur]&&ST[cur].id==='editorial'&&edAny>.15)||igOpen||ytOpen||tkOpen||mvOpen||(window.__picOpen&&window.__picOpen())||document.body.classList.contains('mapinfo')||U.r<.88||['pz','fw','jg','jq','wv','pv'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('on')}));
-  $d('apx').style.display=(DESC.mode==='scroll'&&DESC.apAny())?'flex':'none';
+  $d('apx').style.display=(DESC.mode==='scroll'&&DESC.apAny()&&!['pv','jg','jq','fin'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('on')}))?'flex':'none';
   DESC.apK=(DESC.apK||0)+((apOpen?1:0)-(DESC.apK||0))*Math.min(1,dtL*5);
   if(!DESC.lifeOn||DESC.mode==='born'||DESC.mode==='return'||DESC.mode==='unborn'){lifeP.copy(_p);lifeV.set(0,0,0);DESC.lifeOn=true}
   else{_tmp.copy(_p).sub(lifeP);lifeV.addScaledVector(_tmp,17.6*dtL).addScaledVector(lifeV,-8.4*dtL);lifeP.addScaledVector(lifeV,dtL)}
