@@ -275,7 +275,7 @@
   #intro,#start,#tvskip{display:none!important}
   #oflash{position:fixed;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;z-index:60;pointer-events:none;opacity:0;background:#fff;box-shadow:0 0 22px 8px rgba(255,255,255,.95),0 0 80px 26px rgba(255,255,255,.45);transform:scale(1);transition:opacity .4s ease-out,transform .4s ease-in}
   #oflash.on{opacity:1;transition:opacity .08s}
-  #apx{position:fixed;right:18px;top:16px;z-index:58;display:none;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(10,10,13,.72);color:#F2F2EE;font:500 11px 'Inter',sans-serif;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(8px)}
+  #apx{position:fixed;right:18px;bottom:22px;z-index:58;display:none;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;border:1px solid rgba(255,255,255,.4);background:rgba(10,10,13,.72);color:#F2F2EE;font:500 11px 'Inter',sans-serif;letter-spacing:.22em;text-transform:uppercase;cursor:pointer;backdrop-filter:blur(8px)}
   html[data-theme=light] #apx{background:rgba(255,255,255,.86);color:#16161A;border-color:rgba(22,22,26,.35)}
   #apx:hover{transform:scale(1.04)}
   #ohint{position:fixed;left:50%;bottom:34px;transform:translateX(-50%);z-index:12;pointer-events:none;font:400 11px 'JetBrains Mono',ui-monospace,monospace;letter-spacing:.34em;color:rgba(255,255,255,.62);opacity:0;transition:opacity .6s;text-align:center;white-space:nowrap}
@@ -1882,7 +1882,7 @@ let mapMode='sec';const pinIcoTex={};
 function icoTex(n){if(pinIcoTex[n])return pinIcoTex[n];const o={tex:null,asp:.85};pinIcoTex[n]=o;const im=new Image();im.onload=()=>{const t=new THREE.Texture(im);t.encoding=THREE.sRGBEncoding;t.anisotropy=8;t.needsUpdate=true;o.tex=t;o.asp=im.width/im.height;o.subs.forEach(f=>f())};o.subs=[];im.src='assets/mapa-pins/n'+n+'.png';return o}
 function pillColored(text,world,col){const c=canvas(8,8),x=c.getContext('2d'),f='600 46px Inter,sans-serif';x.font=f;const w=Math.ceil(x.measureText(text).width+60),h=82;c.width=w;c.height=h;
   x.fillStyle=col;x.beginPath();x.moveTo(h/2,2);x.arcTo(w-2,2,w-2,h-2,h/2-2);x.arcTo(w-2,h-2,2,h-2,h/2-2);x.arcTo(2,h-2,2,2,h/2-2);x.arcTo(2,2,w-2,2,h/2-2);x.fill();
-  x.font=f;x.fillStyle=/^#(FF00B2|FA3710|005BFC)$/i.test(col)?'#111':'#111';x.textBaseline='middle';x.textAlign='center';x.fillText(text,w/2,h/2+2);
+  x.font=f;x.fillStyle=/^#(FA3710|005BFC|4C8BFF)$/i.test(col)?'#fff':'#111';x.textBaseline='middle';x.textAlign='center';x.fillText(text,w/2,h/2+2);
   const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:mkTex(c),transparent:true,depthTest:false,depthWrite:false}));sp.scale.set(w/h*world,world,1);sp.renderOrder=10;return sp}
 function pinColors(){const out={};mapPD.forEach(d=>{const sec=PIN_SEC[d.p.id];if(sec)out[d.p.id]=SECCOL[sec]});
   mapPD.forEach(d=>{if(out[d.p.id])return;/* sin sector: toma el color de la luz más cercana */let best=null,bd=1e9;mapPD.forEach(e=>{if(!PIN_SEC[e.p.id])return;const dd=(d.v.x-e.v.x)**2+(d.v.z-e.v.z)**2;if(dd<bd){bd=dd;best=e}});out[d.p.id]=best?SECCOL[PIN_SEC[best.p.id]]:M3.CSS[d.p.c]});return out}
