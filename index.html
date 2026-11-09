@@ -1401,7 +1401,7 @@ station({id:'merch',az:D(322),R:27,y:1,title:'Merch',text:'Lo que te podés llev
 /* SEÑALÉTICA: el soporte de madera y acrílico en el centro y, alrededor, un carrusel con cada pictograma montado en el soporte; al tocar uno se agranda */
 const sopCache=[];
 function sopCard(k){if(sopCache[k])return sopCache[k];if(!SOP.post||!SOP.pics[k])return null;const c=document.createElement('canvas');c.width=700;c.height=1040;const x=c.getContext('2d');const sc=.62,ox=30,oy=20;x.drawImage(SOP.post,ox,oy,1024*sc,1536*sc);sopPlace(x,SOP.pics[k],ox,oy,sc,PICTOS[k].n);return sopCache[k]=c.toDataURL('image/png')}
-window.SEN_ITEMS=['Cafetería','Baño','Accesibilidad','Informes','Información','Plaza central','Gift shop','Mapa'].map((n,k)=>({n,src:'assets/senaletica/s'+(k+1)+'.webp'}));/* las cards: los soportes en el predio (se abren grandes con flechas) */
+window.SEN_ITEMS=['Cafetería','Baño','Accesibilidad','Informes','Información','Plaza central','Gift shop','Mapa','Colgante','Muro'].map((n,k)=>({n,src:'assets/senaletica/s'+(k+1)+'.webp'}));/* las cards: los soportes en el predio (se abren grandes con flechas) */
 station({id:'senaletica',az:D(100),R:27,y:.4,title:'Señalética',text:'El sistema de soportes: madera y acrílico con cada pictograma impreso.'+String.fromCharCode(92)+'nTocá uno para verlo en grande.',cam:{r:9.5,ph:.06}},g=>modelRing(g,'senaletica',window.SEN_ITEMS,{src:'assets/pictos/soporte.webp',aspect:1024/1536,trim:true,MH:5.6,sw:2.6,RX:5.6,cw:2.3,ry:-1.2}));
 
 /* 12 Indumentaria de staff */
