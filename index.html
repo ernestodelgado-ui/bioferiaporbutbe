@@ -620,10 +620,10 @@ ticks.push(t=>{const on=cur===seedIdx&&started?1:0;sparkVis+=(on-sparkVis)*.06;
   appearFlash.visible=vis&&sinceF>=0&&sinceF<1.4&&seedStep<2;if(appearFlash.visible){appearFlash.position.set(0,.5,0);appearFlash.material.opacity=Math.max(0,1-sinceF/1.2)*.8;appearFlash.scale.setScalar(1+sinceF*4)}
   sparkFlash.visible=vis&&sinceM>SPK_MERGE-.5&&sinceM<SPK_MERGE+1.2;if(sparkFlash.visible){const a=sinceM-SPK_MERGE;sparkFlash.position.set(0,.5,0);sparkFlash.material.opacity=Math.max(0,1-Math.abs(a)/(a<0?.5:1.1))*.95;sparkFlash.scale.setScalar(2+Math.max(0,a+.5)*7)}
   SPK.forEach((s,i)=>{[s.halo,s.core,s.hot,...s.tr].forEach(o=>o.visible=show);if(!show)return;
-    const pos=tt=>{const ap=Math.min(1,Math.max(0,(tt-seedFlameT0)/SPK_APPEAR)),ea=1-Math.pow(1-ap,3),m=seedStep>=2?Math.min(1,Math.max(0,(tt-seedMergeT0)/SPK_MERGE)):0,me=m*m*m,k=ea*(1-me),q=SPK_FREE(s,tt);return new V3(q[0]*k,.5+(q[1]-.5)*k,q[2]*k)},P=pos(t),
+    const pos=tt=>{const ap=Math.min(1,Math.max(0,(tt-seedFlameT0)/SPK_APPEAR)),ea=1-Math.pow(1-ap,3),m=seedStep>=2?Math.min(1,Math.max(0,(tt-seedMergeT0)/SPK_MERGE)):0,me=m*m*m,k=ea*(1-me),q=SPK_FREE(s,tt);return new V3(q[0]*k,.5+(q[1]-.5)*k,(q[2]+(window.__BE&&window.__BE.ready?window.__BE.ex(i,tt)*2.0:0))*k)},P=pos(t),
       ap0=Math.min(1,Math.max(0,sinceF/SPK_APPEAR)),v=sparkVis*ap0*(seedStep>=2?Math.max(0,1-Math.max(0,sinceM-SPK_MERGE*.9)/.3):1),fl=1+Math.sin(t*11+i*2)*.12+Math.sin(t*17+i)*.06,beat=i===4?1+Math.sin(t*6)*.18:1;
-    s.core.position.copy(P);s.core.material.opacity=v;s.core.scale.setScalar(1.1*fl*beat);
-    s.hot.position.copy(P);s.hot.material.opacity=v*.95;s.hot.scale.setScalar(.4*beat);
+    s.core.position.copy(P);s.core.material.opacity=window.__BE&&window.__BE.ready?v*.3:v;s.core.scale.setScalar(1.1*fl*beat);if(window.__BE)window.__BE.sp(i,P,v,t);
+    s.hot.position.copy(P);s.hot.material.opacity=(window.__BE&&window.__BE.ready?0:v*.95);s.hot.scale.setScalar(.4*beat);
     s.halo.position.copy(P);s.halo.material.opacity=v*.4*(.8+.2*Math.sin(t*5+i));s.halo.scale.setScalar(3*beat);
     for(let k=0;k<SPK_TR;k++){const o=s.tr[k];o.position.copy(pos(t-(k+1)*.07));o.material.opacity=v*.5*(1-(k+1)/(SPK_TR+1));o.scale.setScalar(.7*(1-k/(SPK_TR*1.3)))}})});
 /* CATÁLISIS en el centro (después de CELEBRAR), tres clics: 1 · la forma se duplica (la tuya y la de otro) · 2 · se juntan y nace una forma nueva · 3 · vuelven a su forma individual,
@@ -1727,7 +1727,7 @@ const FX=(()=>{
   ticks.push(t=>pulses.forEach(p=>{const mine=false; /* todas las llamas siempre visibles */p.k=(p.k===undefined?1:p.k)+((mine?0:1)-(p.k===undefined?1:p.k))*.08;const vis=p.k>.02;p.halo.visible=p.flame.visible=p.core.visible=vis;if(!vis)return;const x=t*p.sp+p.ph,n=.5+.28*Math.sin(x*3.1)+.17*Math.sin(x*7.3+1.7)+.1*Math.sin(x*13.1+.4),m=.5+.5*Math.sin(x*2.3+2.1);
     p.flame.scale.set(1.1+.8*n,1.5+1.1*n,1);p.flame.material.opacity=(.55+.4*n)*p.k;p.halo.scale.setScalar(2.1+.8*m);p.halo.material.opacity=(.2+.2*m)*p.k;p.core.scale.setScalar(.4+.35*n);const e=finaleK*finaleK*(3-2*finaleK),FJ=[0,3,6,9].indexOf(p.idx),mine4=FJ>=0,a=t*.42+(mine4?FJ:0)*1.5708,Rr=2.9,tl=(FJ%2?.45:-.4),O=new V3(Math.cos(a)*Rr,.55+Math.sin(a)*Rr*tl+Math.sin(t*.7+p.idx)*.15,Math.sin(a)*Rr*.9);
     const em=mine4?e:0,px=p.base.x+(O.x-p.base.x)*em,py=p.base.y+(O.y-p.base.y)*em,pz=p.base.z+(O.z-p.base.z)*em,sf=1-.3*e,qk=mine4?1:1-e;
-    p.halo.position.set(px,py,pz);p.flame.position.set(px+Math.sin(x*1.7)*.05,py+.22*(1-e*.5),pz);p.core.position.set(px,py+.16*(1-e*.5),pz);
+    p.halo.position.set(px,py,pz);if(mine4&&window.__BE)window.__BE.fin(FJ,px,py,pz,e,t);p.flame.position.set(px+Math.sin(x*1.7)*.05,py+.22*(1-e*.5),pz);p.core.position.set(px,py+.16*(1-e*.5),pz);
     [p.flame,p.halo,p.core].forEach(o=>{o.scale.multiplyScalar(sf);o.material.opacity*=qk;if(!mine4&&e>.98)o.visible=false})}));
   const n=2600,pos=new Float32Array(n*3);for(let i=0;i<n;i++){const a=Math.random()*6.2832,rr=6+Math.random()*52;pos[i*3]=Math.sin(a)*rr;pos[i*3+1]=16-Math.random()*420;pos[i*3+2]=-Math.cos(a)*rr}
   const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.BufferAttribute(pos,3));
@@ -2595,6 +2595,37 @@ setInterval(OPEN.hintReady,400);
  addEventListener('keydown',e=>{if(OPEN.on&&(e.key===' '||e.key==='Enter'||e.key==='ArrowRight')){e.preventDefault();OPEN.click()}})}
 if(isNaN(parseInt(location.hash.slice(1))))OPEN.start();
 OPEN.dbg=()=>({fov:camera.fov,asp:camera.aspect,iw:innerWidth,ih:innerHeight,d1:OPEN.dBig1,P:_op.toArray(),Lk:_ol.toArray(),cam:camera.position.toArray(),c1:SC1.position.toArray(),sc:[SC1.userData.vid.videoWidth,SC1.userData.vid.videoHeight,SC1.userData.h,SC1.userData.w],S:[S.th,S.ph,S.r,S.f.toArray()],off:camera.view&&camera.view.enabled,sr:SC1.scale.toArray(),opgz:OPG.position.toArray()});
+
+/* ---- los seres del juego reemplazan a las 4 luces (al principio y al final): giran con su luz y su estela y, de a uno, uno se acerca a la cámara y vuelve ---- */
+const BE={ord:[2,3,0,1],ready:0,tex:[],asp:[],fsp:[],_w:new V3(),_t:new V3(),_d:new V3(),_c:new V3(0,.5,0)};
+BE.mk=(src,cb)=>{const im=new Image();im.onload=()=>{const N=256,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d');x.drawImage(im,0,0,N,N);const d=x.getImageData(0,0,N,N),a=d.data;
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++){const k=(j*N+i)*4,dx=(i+.5)/N*2-1,dy=(j+.5)/N*2-1,r=Math.sqrt(dx*dx+dy*dy),m=Math.max(0,Math.min(1,(1-r)/.3)),mm=m*m*(3-2*m);for(let q=0;q<3;q++)a[k+q]=Math.max(0,a[k+q]-24)/231*255*mm;a[k+3]=255}
+  x.putImageData(d,0,0);cb(mkTex(c))};im.src=src};
+BE.sprite=t=>{const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,blending:ADD,transparent:true,depthWrite:false,opacity:0,fog:false}));s.renderOrder=44;s.visible=false;scene.add(s);return s};
+const _sm=x=>{x=Math.max(0,Math.min(1,x));return x*x*(3-2*x)};
+/* acercarse a la cámara: 0 → 1 → 0; cada ser tiene su turno */
+BE.near=(k,t)=>{const P=18,u=(t+k*P/4)%P;if(u>4.2)return 0;return u<1.4?_sm(u/1.4):u<2.8?1:_sm(1-(u-2.8)/1.4)};
+BE.col=[COL.fuego,COL.aire,COL.tierra,COL.agua];BE.tr={};
+/* luz que envuelve a cada ser y estela del color de su elemento */
+BE.halo={};
+BE.trail=(k,tag,pos,vis)=>{const id=tag+k;let T=BE.tr[id];if(!T){T=BE.tr[id]={h:[],g:[],hl:glow(BE.col[k],2.6,0)};T.hl.renderOrder=43;T.hl.visible=false;scene.add(T.hl);for(let j=0;j<12;j++){const g=glow(BE.col[k],1,0);g.renderOrder=43;g.visible=false;scene.add(g);T.g.push(g)}}
+  T.h.unshift(pos.clone());if(T.h.length>40)T.h.pop();
+  T.hl.visible=vis>.02;T.hl.position.copy(pos);T.hl.material.opacity=vis*.5;
+  T.g.forEach((g,j)=>{const q=T.h[Math.min(T.h.length-1,(j+1)*3)];if(!q||vis<.02){g.visible=false;return}g.visible=true;g.position.copy(q);const f=1-j/12;g.scale.setScalar(.15+.75*f);g.material.opacity=vis*.5*f*f})};
+let _beN=0;
+['assets/seres/s1.jpg','assets/seres/s2.jpg','assets/seres/s3.jpg','assets/seres/s4.jpg'].forEach((src,i)=>BE.mk(src,t=>{BE.tex[i]=t;if(++_beN===4){
+  for(let k=0;k<4;k++){BE.asp[k]=BE.sprite(BE.tex[BE.ord[k]]);BE.fsp[k]=BE.sprite(BE.tex[BE.ord[k]])}
+  BE.ready=1}}));
+/* principio: las chispas de luz (con su halo y su estela) llevan al ser en el centro; solo 4, cada uno de su color. De a uno se acerca a la cámara y vuelve */
+BE.sord=[0,3,1,0,2];/* fuego, aire, agua, tierra, rosa: 5 colores */BE.stint=[COL.fuego,null,null,COL.tierra,null];
+BE.sps=[];BE.ex=(i,tt)=>BE.near(i,tt);
+BE.sp=(i,P,v,t)=>{if(!BE.ready)return;let s=BE.sps[i];if(!s){s=BE.sps[i]=new THREE.Sprite(new THREE.SpriteMaterial({map:BE.tex[BE.sord[i]],blending:ADD,transparent:true,depthWrite:false,opacity:0,fog:false}));if(BE.stint[i])s.material.color.set(BE.stint[i]).lerp(new THREE.Color(1,1,1),.45);s.renderOrder=44;sparkG.add(s)}
+  const nr=BE.near(i,t);s.visible=v>.02;s.position.copy(P);const sc=(.8+nr*.25);s.scale.set(sc,sc,1);s.material.opacity=Math.min(1,v*1.15)};
+/* final: las 4 flamas que rodeaban la forma pasan a ser los seres (con su luz y su estela) */
+BE.fin=(k,x,y,z,e,t)=>{if(!BE.ready)return;const s=BE.fsp[k];if(!s)return;const nr=e>.9?BE.near(k+2,t):0;
+  BE._w.set(x,y,z);const dist=BE._w.distanceTo(camera.position),pull=nr*Math.min(dist*.3,2.6);BE._d.copy(camera.position).sub(BE._w).normalize();
+  s.position.copy(BE._w).addScaledVector(BE._d,pull);const sc=(.9+nr*.55)*(.5+.5*e);s.scale.set(sc,sc,1);s.material.opacity=Math.min(1,e*1.2);s.visible=e>.02;BE.trail(k,'f',s.position,Math.min(1,e*1.2))};
+window.__BE=BE;
 
 }
 const SKIP_INTRO=false; // pasar a false para volver a la apertura de Butbe
