@@ -2294,11 +2294,19 @@ function glideTo(i){snapI=clamp(i,0,SNAPS.length-1);const y0=scrollY,y1=posOf(SN
 DESC.snapTo=snapTo;Object.defineProperty(DESC,'snapI',{get:()=>snapI});DESC.nSnaps=()=>SNAPS.length;
 addEventListener('wheel',e=>{if(e.defaultPrevented||DESC.mode!=='scroll'||e.target!==cv)return;e.preventDefault();
   const now=performance.now(),gap=now-wLast;wLast=now;if(gap>140){wAllowed=true;wAcc=0}/* un gesto nuevo: la inercia del trackpad no dispara más pasos */
-  if(!wAllowed||now<wLock)return;wAcc+=e.deltaY;if(Math.abs(wAcc)>35){wAllowed=false;(wAcc>0&&snapI<SCR_N?glideTo(SCR_N):snapTo(snapI+(wAcc>0?1:-1)));wAcc=0;wLock=now+600}},{passive:false});
+  if(!wAllowed||now<wLock)return;wAcc+=e.deltaY;if(Math.abs(wAcc)>35){wAllowed=false;if(!mapGate(wAcc>0?1:-1))(wAcc>0&&snapI<SCR_N?glideTo(SCR_N):snapTo(snapI+(wAcc>0?1:-1)));wAcc=0;wLock=now+600}},{passive:false});
 addEventListener('scroll',()=>{if(DESC.mode!=='scroll')return;clearTimeout(snapT);snapT=setTimeout(()=>{/* táctil o barra de scroll: al soltar, se centra en el paso más cercano */
   const u=clamp(scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight),0,1)*uMax;let b=0;SNAPS.forEach((p,i)=>{if(Math.abs(p-u)<Math.abs(SNAPS[b]-u))b=i});if(snapI<SCR_N-1&&b>snapI)b=snapI;if(Math.abs(scrollY-posOf(SNAPS[b]))>2)snapTo(b);else snapI=b},160)},{passive:true});
 addEventListener('keydown',e=>{if(DESC.mode!=='scroll')return;const nx=['ArrowDown','PageDown','ArrowRight',' '],pv=['ArrowUp','PageUp','ArrowLeft'];
-  if(nx.includes(e.key)){e.preventDefault();snapTo(snapI+1)}else if(pv.includes(e.key)){e.preventDefault();snapTo(snapI-1)}});
+  if(nx.includes(e.key)){e.preventDefault();if(!mapGate(1))snapTo(snapI+1)}else if(pv.includes(e.key)){e.preventDefault();if(!mapGate(-1))snapTo(snapI-1)}});
+/* ---------- mapa de dos caras en el modo scroll: Siguiente / ← giran la placa; con la cara final, pasan de estación ---------- */
+function mapGate(dir){if(DESC.mode!=='scroll'||cur<0||!ST[cur]||ST[cur].id!=='espacios'||!mapReady||!MF.go)return false;
+  if(MF.busy)return true;if(dir>0&&MF.face===0){MF.go(1);return true}if(dir<0&&MF.face===1){MF.go(0);return true}return false}
+{const css=document.createElement('style');css.textContent='#mnav{position:fixed;right:32px;bottom:40px;z-index:11;display:flex;gap:10px;opacity:0;pointer-events:none;transition:opacity .5s}#mnav.on{opacity:1;pointer-events:auto}#mnav .pill:disabled{opacity:.35;cursor:default;box-shadow:none}@media (max-width:700px){#mnav{right:16px;bottom:56px}}body.open #mnav{opacity:0!important;pointer-events:none!important}';document.head.appendChild(css);
+  const nv=document.createElement('div');nv.id='mnav';nv.innerHTML='<button class="pill ghost" id="mprev" aria-label="Anterior">←</button><button class="pill" id="mnext">Siguiente →</button>';document.body.appendChild(nv);
+  const stepMap=dir=>{if(DESC.mode!=='scroll')return;if(mapGate(dir))return;snapTo(snapI+dir)};
+  nv.querySelector('#mnext').onclick=e=>{e.stopPropagation();stepMap(1)};nv.querySelector('#mprev').onclick=e=>{e.stopPropagation();stepMap(-1)};
+  ticks.push(()=>{const on=DESC.mode==='scroll'&&cur>=0&&!!ST[cur]&&ST[cur].id==='espacios'&&mapReady;nv.classList.toggle('on',!!on);if(on){nv.querySelector('#mprev').disabled=MF.busy;nv.querySelector('#mnext').disabled=MF.busy}})}
 /* ---------- salir de cualquier apartado + marketing: el clic pasa de pantalla ---------- */
 DESC.apAny=()=>(!!ST[cur]&&ST[cur].id==='editorial'&&edAny>.15)||cmpOpen||pstOpen||dipOpen||revOpen||triOpen||cxOpen||igOpen||ytOpen||tkOpen||mvOpen||(window.__picOpen&&window.__picOpen())||document.body.classList.contains('mapinfo')||U.r<.88||['pz','fw','wv'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('on')});
 DESC.closeAll=()=>{cmpOpen=false;pstOpen=false;dipOpen=false;revOpen=false;triOpen=false;cxOpen=false;igOpen=false;igSel=-1;igPh=false;ytOpen=false;tkOpen=false;mvOpen=false;try{closePz()}catch(e){}try{closeInfo()}catch(e){}try{closeWeb()}catch(e){}try{if(fw.classList.contains('on'))closeFuego()}catch(e){}if(window.__picClose)window.__picClose();U.r=1;UD.r=1};
