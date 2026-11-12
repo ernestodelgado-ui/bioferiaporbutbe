@@ -57,9 +57,7 @@
   #cap.on{opacity:1}
   #cap .n{display:none!important;letter-spacing:.34em;font-size:13px;color:var(--rosa);margin-bottom:8px}
   #cap h2{margin:0 0 12px;font-weight:300;font-size:clamp(30px,4.5vw,60px);letter-spacing:.02em;line-height:1.05}
-  #cap h2 .cbt{height:clamp(56px,9.5vw,150px);width:auto;max-width:94vw;vertical-align:middle;position:relative;top:4vh}
-  #cap h2 .cbt-d{display:inline-block}#cap h2 .cbt-l{display:none}
-  html[data-theme=light] #cap h2 .cbt-d{display:none}html[data-theme=light] #cap h2 .cbt-l{display:inline-block}
+  #cap h2 .cbt{height:clamp(46px,7.8vw,124px);width:auto;max-width:94vw;vertical-align:middle;position:relative;top:4vh}
   #cap p{display:none!important;white-space:pre-line;margin:0 auto;max-width:680px;font-size:clamp(16px,1.7vw,19px);line-height:1.55;color:var(--dim);font-weight:300}
   #nav{right:32px;bottom:40px;display:flex;gap:10px;pointer-events:auto;opacity:0;transition:opacity .8s}
   #nav.on{opacity:1}
@@ -1763,7 +1761,7 @@ function go(i){
   U.th=U.ph=0;U.r=1;U.f.set(0,0,0);
   cap.classList.remove('on');document.body.classList.toggle('st-pos',s.id==='posteres');
   setTimeout(()=>{if(cur!==i)return;if(s.id==='seed'&&noCapSeed)return;
-    if(s.id==='agencia'){const h=cap.querySelector('h2');h.style.cssText='width:96vw;margin-left:calc(50% - 48vw)';h.innerHTML='<img class="cbt cbt-l" src="assets/palabras/concepto-bioferia-claro.png" alt="Concepto Bioferia"><img class="cbt cbt-d" src="assets/palabras/concepto-bioferia-oscuro.png" alt="Concepto Bioferia">'}else{const h=cap.querySelector('h2');h.style.cssText='';h.textContent=s.title}cap.querySelector('p').textContent=s.text;cap.classList.add('on');if(s.id==='seed')setTimeout(()=>{if(cur===i)cap.classList.remove('on')},4200)},450);
+    if(s.id==='agencia'){const h=cap.querySelector('h2');h.style.cssText='width:96vw;margin-left:calc(50% - 48vw)';h.innerHTML='<img class="cbt" src="assets/palabras/concepto.png" alt="Concepto">'}else{const h=cap.querySelector('h2');h.style.cssText='';h.textContent=s.title}cap.querySelector('p').textContent=s.text;cap.classList.add('on');if(s.id==='seed')setTimeout(()=>{if(cur===i)cap.classList.remove('on')},4200)},450);
   [...dots.children].forEach((d,k)=>d.classList.toggle('a',k===i));
   next.textContent=i===ST.length-1?'Volver al inicio ↺':'Siguiente →'}
 const dots=document.getElementById('dots'),next=document.getElementById('next');
