@@ -58,6 +58,18 @@
   #cap .n{display:none!important;letter-spacing:.34em;font-size:13px;color:var(--rosa);margin-bottom:8px}
   #cap h2{margin:0 0 12px;font-weight:300;font-size:clamp(30px,4.5vw,60px);letter-spacing:.02em;line-height:1.05}
   #cap h2 .cbt{height:clamp(46px,7.8vw,124px);width:auto;max-width:94vw;vertical-align:middle;position:relative;top:4vh}
+  #cap h2 .cbt-p{height:clamp(42px,7vw,112px)}
+  #cap h2 .cbt-j{height:clamp(44px,7vw,112px)}
+  #cap h2 .cbt-ap{height:clamp(34px,5.8vw,92px)}
+  #cap h2 .cbt-w{height:clamp(44px,7vw,112px)}
+  #cap h2 .cbt-m{height:clamp(36px,5.8vw,92px)}
+  #cap h2 .cbt-st{height:clamp(40px,6.6vw,106px)}
+  #cap h2 .cbt-es{height:clamp(36px,5.8vw,92px)}
+  #cap h2 .cbt-s{height:clamp(36px,6vw,96px)}
+  #cap h2 .cbt-pi{height:clamp(36px,5.8vw,92px)}
+  #cap h2 .cbt-e{height:clamp(40px,6.6vw,106px)}
+  #cap h2 .cbt-g{height:clamp(34px,5.2vw,84px)}
+  html:not([data-theme=light]) #cap h2 .cbt-g{filter:brightness(1.9) saturate(.9)}
   #cap p{display:none!important;white-space:pre-line;margin:0 auto;max-width:680px;font-size:clamp(16px,1.7vw,19px);line-height:1.55;color:var(--dim);font-weight:300}
   #nav{right:32px;bottom:40px;display:flex;gap:10px;pointer-events:auto;opacity:0;transition:opacity .8s}
   #nav.on{opacity:1}
@@ -1313,7 +1325,7 @@ const JSCR=[{t:'CATÁLISIS',c:'#FF00B2',img:'assets/juego/01.png',steps:JSTEPS,h
   l:['Elegí una forma y escribí tu nombre','Sumale Agua, Fuego, Aire, Tierra o Corazón','Mirá cómo evoluciona tu ser','Activá un superpoder','Llevátelo para imprimir y compartir']}];
 const JSET={scr:JSCR,ph:jPh,url:'https://catalisis-one.vercel.app/#inicio',qr:'assets/qr/juego.png',vid:'media/demo-juego.webm'};const jHits=[];
 function wrapTxt(x,t,px,py,maxW,lh){let ln='',y=py;t.split(' ').forEach(w=>{const q=ln?ln+' '+w:w;if(x.measureText(q).width>maxW&&ln){x.fillText(ln,px,y);y+=lh;ln=w}else ln=q});x.fillText(ln,px,y);return y}
-station({id:'juego',az:D(292),R:27,y:.6,title:'Idea innovadora · Juego',text:'Elegí una forma, sumale elementos y mirá cómo evoluciona tu ser.',cam:{r:14.5,ph:.05}},g=>{
+station({id:'juego',az:D(292),R:27,y:.6,title:'Idea innovadora · Juego',text:'Elegí una forma, sumale elementos y mirá cómo evoluciona tu ser.',cam:{r:11,ph:.05}},g=>{
   juegoG=g;const PS=1.75,YB=.05;
   const sc=canvas(468,1012),sx=sc.getContext('2d'),stex=mkTex(sc),smat=new THREE.MeshBasicMaterial({map:stex,color:'#fff'});
   const imgs=JSTEPS.map(st=>{const im=new Image();im.src='assets/juego/'+st.f+'.png';return im});
@@ -1761,7 +1773,7 @@ function go(i){
   U.th=U.ph=0;U.r=1;U.f.set(0,0,0);
   cap.classList.remove('on');document.body.classList.toggle('st-pos',s.id==='posteres');
   setTimeout(()=>{if(cur!==i)return;if(s.id==='seed'&&noCapSeed)return;
-    if(s.id==='agencia'){const h=cap.querySelector('h2');h.style.cssText='width:96vw;margin-left:calc(50% - 48vw)';h.innerHTML='<img class="cbt" src="assets/palabras/concepto.png" alt="Concepto">'}else{const h=cap.querySelector('h2');h.style.cssText='';h.textContent=s.title}cap.querySelector('p').textContent=s.text;cap.classList.add('on');if(s.id==='seed')setTimeout(()=>{if(cur===i)cap.classList.remove('on')},4200)},450);
+    const TI={agencia:['concepto','Concepto',''],posteres:['posters','Posters',' cbt-p'],graficas:['graficas','Gráficas audiovisuales',' cbt-g'],editorial:['editorial','Editorial',' cbt-e'],pictos:['pictogramas','Pictogramas',' cbt-pi'],senaletica:['senaletica','Señalética',' cbt-s'],espacios:['espacios','Espacios',' cbt-es'],staff:['staff','Staff',' cbt-st'],merch:['merch','Merch',' cbt-m'],marketing:['marketing','Marketing y redes',' cbt-g'],web:['web','Página web',' cbt-w'],app:['aplicacion','Aplicación',' cbt-ap'],juego:['juego','Juego',' cbt-j']}[s.id];if(TI){const h=cap.querySelector('h2');h.style.cssText='width:96vw;margin-left:calc(50% - 48vw)';h.innerHTML='<img class="cbt'+TI[2]+'" src="assets/palabras/'+TI[0]+'.png" alt="'+TI[1]+'">'}else{const h=cap.querySelector('h2');h.style.cssText='';h.textContent=s.title}cap.querySelector('p').textContent=s.text;cap.classList.add('on');if(s.id==='seed')setTimeout(()=>{if(cur===i)cap.classList.remove('on')},4200)},450);
   [...dots.children].forEach((d,k)=>d.classList.toggle('a',k===i));
   next.textContent=i===ST.length-1?'Volver al inicio ↺':'Siguiente →'}
 const dots=document.getElementById('dots'),next=document.getElementById('next');
