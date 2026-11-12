@@ -1009,7 +1009,7 @@ const edG=[],cmpMeshes=[],cmpPs=[],edHits=[],dipIm=[],triIm=[],cxIm=[];let cxOpe
 station({id:'editorial',az:D(172),R:27,y:-.8,title:'Diseño editorial',text:'Libros, folletos y cartillas en seis formatos: campaña, díptico, editorial complejo, póster, revista y tríptico.',cam:{r:15,ph:.1}},g=>{
   const edRow=new THREE.Group();g.add(edRow);autoCenter(edRow,'editorial');
   /* las seis piezas (en lugar de las carpetas rosas): cada una flota con su tapa y su nombre; al tocarla se abre su interior */
-  const EDP=[{ed:0,n:'CAMPAÑAS',src:'assets/campana/05.webp'},{ed:1,n:'DÍPTICO',src:'assets/revista/01.jpg'},{ed:2,n:'EDITORIAL COMPLEJO',src:'assets/complejo/frame-71.jpg',crop:[0,0,.709,1]},
+  const EDP=[{ed:0,n:'CAMPAÑAS',src:'assets/campana/n3.jpg'},{ed:1,n:'DÍPTICO',src:'assets/revista/01.jpg'},{ed:2,n:'EDITORIAL COMPLEJO',src:'assets/complejo/frame-71.jpg',crop:[0,0,.709,1]},
     {ed:4,n:'FANZINE',src:'assets/revista/02.jpg'},{ed:3,n:'POSTER',src:'assets/campana/poster.webp'},{ed:5,n:'TRÍPTICO',src:'assets/triptico/exterior.jpg',crop:[.5,0,.5,1]}];
   EDP.forEach((r,i)=>{const g1=new THREE.Group(),mat=new THREE.MeshBasicMaterial({side:THREE.DoubleSide,toneMapped:false}),m=new THREE.Mesh(new THREE.PlaneGeometry(1,1.414),mat);m.userData.ed=r.ed;m.visible=false;
     const im=new Image();im.onload=()=>{const cr=r.crop||[0,0,1,1],sx=Math.round(im.width*cr[0]),sy=Math.round(im.height*cr[1]),sw=Math.round(im.width*cr[2]),sh=Math.round(im.height*cr[3]),k=Math.min(1,1100/Math.max(sw,sh)),c=canvas(Math.round(sw*k),Math.round(sh*k));c.getContext('2d').drawImage(im,sx,sy,sw,sh,0,0,c.width,c.height);
@@ -1024,8 +1024,8 @@ station({id:'editorial',az:D(172),R:27,y:-.8,title:'Diseño editorial',text:'Lib
     const near=cur>=0&&!!ST[cur]&&ST[cur].id==='editorial';if(near===last)return;last=near;mats.forEach(m=>{m.fog=!near;m.needsUpdate=true})})}
   /* carrusel de la campaña: 6 afiches en anillo */
   const cg=new THREE.Group();cg.visible=false;g.add(cg);cmpG0=cg;
-  for(let i=0;i<6;i++){const m=new THREE.MeshBasicMaterial({transparent:true,side:THREE.DoubleSide,depthWrite:false});
-    new THREE.TextureLoader().load('assets/campana/0'+(i+1)+'.webp',t=>{t.encoding=THREE.sRGBEncoding;t.anisotropy=8;m.map=t;m.needsUpdate=true});
+  for(let i=0;i<4;i++){const m=new THREE.MeshBasicMaterial({transparent:true,side:THREE.DoubleSide,depthWrite:false});
+    new THREE.TextureLoader().load('assets/campana/n'+(i+1)+'.jpg',t=>{t.encoding=THREE.sRGBEncoding;t.anisotropy=8;m.map=t;m.needsUpdate=true});
     const mesh=new THREE.Mesh(new THREE.PlaneGeometry(2.3,3.26),m);mesh.userData.c=i;cg.add(mesh);cmpMeshes.push(mesh);cmpPs.push(mesh)}
   const cap2=panel(5,.7,(x,w,h)=>{x.textAlign='center';x.fillStyle=INK();x.font='400 '+h*.5+'px Inter';x.fillText('CAMPAÑA'.split('').join(String.fromCharCode(8202)),w/2,h*.62)},{px:800,eo:0,dw:false,th:true});cap2.position.set(0,-2.6,3.6);cg.add(cap2);
   /* díptico: los dos afiches uno sobre otro y, al lado, el video de la apertura */
@@ -1100,7 +1100,7 @@ if(!here&&cmpOpen)cmpOpen=false;
     cmpP+=((cmpOpen?1:0)-cmpP)*Math.min(1,dt*(cmpOpen?3.4:5));if(Math.abs(cmpP-(cmpOpen?1:0))<.003)cmpP=cmpOpen?1:0;
     if(!cmpDrag)cmpCf+=(cmpCt-cmpCf)*(1-Math.exp(-dt*2.6));
     cg.visible=cmpP>.06;const e=1-Math.pow(1-cmpP,3);
-    cmpPs.forEach((m,i)=>{let d=((i-cmpCf)%6+9)%6-3;const ph=d*Math.PI*2/6,sel=Math.max(0,1-Math.abs(d)),R=3.6;
+    cmpPs.forEach((m,i)=>{let d=((i-cmpCf)%4+6)%4-2;const ph=d*Math.PI*2/4,sel=Math.max(0,1-Math.abs(d)),R=3.2;
       m.position.set(Math.sin(ph)*(R+.8*sel),.4+Math.sin(t*.6+i)*.03,Math.cos(ph)*(R+.8*sel));m.rotation.y=ph;m.scale.setScalar((.01+.99*e)*(1+.3*sel));
       const ff=(Math.cos(ph)+1)/2;m.material.color.setScalar(sel>0?1:.3+.6*Math.pow(ff,1.4))});
     edG.forEach(g1=>{const k=1-Math.max(cmpP,pstP,dipP,revP,triP,cxP);g1.visible=k>.02;g1.scale.setScalar((g1.userData.s||2.8)*Math.max(.01,k))})})});
@@ -2047,7 +2047,7 @@ ticks.push(()=>{if(pz.classList.contains('on')&&(cur<0||!ST[cur]||ST[cur].id!==G
 window.__pz=openPz;
 let pzCapHid=false;ticks.push(()=>{const on=pz.classList.contains('on');const c=document.getElementById('cap');if(on){c.style.opacity='0';pzCapHid=true}else if(pzCapHid){pzCapHid=false;c.style.opacity=''}});window.__gal=galOpen;
 /* galerías de las piezas editoriales */
-const GAL_CMP=['assets/campana/01.webp','assets/campana/02.webp','assets/campana/03.webp','assets/campana/mockup.webp','assets/campana/04.webp','assets/campana/05.webp','assets/campana/06.webp'],
+const GAL_CMP=['assets/campana/n1.jpg','assets/campana/n2.jpg','assets/campana/n3.jpg','assets/campana/n4.jpg'],
   GAL_DIP=['assets/diptico/exterior.jpg','assets/diptico/interior.jpg'],GAL_TRI=['assets/triptico/exterior.jpg','assets/triptico/interior.jpg'],GAL_CX=['assets/complejo/frame-71.jpg','assets/complejo/frame-75.jpg'],
   GAL_PST=['assets/campana/poster.webp','assets/campana/mockup-poster.webp'],GAL_REV=[1,2,3,4,5,6,7,8].map(n=>'assets/revista/0'+n+'.jpg');
 function posPick(i){const d=((i-Math.round(posCf))%POSC+POSC*1.5)%POSC-POSC/2;posCt=Math.round(posCf)+Math.round(d)}
@@ -2067,7 +2067,7 @@ cv.addEventListener('pointerup',e=>{if(!igDn||Math.hypot(e.clientX-igDn.x,e.clie
   if(revOpen){const h=rayAt(e,revMeshes.map(o=>o.mesh));if(h.length){const i=h[0].object.userData.r,d=((i-Math.round(revCf))%8+12)%8-4;revCt=Math.round(revCf)+d}else revOpen=false;return}
   if(pstOpen&&pstM&&rayAt(e,[pstM]).length){openFoto('mockup-poster');return}/* póster: al tocarlo se ve puesto en la calle */
   if(pstOpen||dipOpen||triOpen||cxOpen){pstOpen=false;dipOpen=false;triOpen=false;cxOpen=false;return}
-  if(cmpOpen){const h=rayAt(e,cmpMeshes);if(h.length){const i=h[0].object.userData.c,d=((i-Math.round(cmpCf))%6+9)%6-3;cmpCt=Math.round(cmpCf)+d;if(i===2)openFoto('mockup')}else cmpOpen=false;return}
+  if(cmpOpen){const h=rayAt(e,cmpMeshes);if(h.length){const i=h[0].object.userData.c,d=((i-Math.round(cmpCf))%4+6)%4-2;cmpCt=Math.round(cmpCf)+d}else cmpOpen=false;return}
   const h=rayAt(e,edHits);if(h.length&&h[0].object.userData.ed===0){cmpOpen=true;cmpCt=Math.round(cmpCf)}if(h.length&&h[0].object.userData.ed===2)cxOpen=true;if(h.length&&h[0].object.userData.ed===3)pstOpen=true;if(h.length&&h[0].object.userData.ed===1)dipOpen=true;if(h.length&&h[0].object.userData.ed===5)triOpen=true;if(h.length&&h[0].object.userData.ed===4){revOpen=true;revCt=Math.round(revCf)}});
 addEventListener('keydown',e=>{if(e.key==='Escape'){cxOpen=false;pstOpen=false;dipOpen=false;revOpen=false;triOpen=false}
   if(revOpen&&e.key==='ArrowRight'){revCt=Math.round(revCf)+1}if(revOpen&&e.key==='ArrowLeft'){revCt=Math.round(revCf)-1}if(!cmpOpen)return;if(e.key==='Escape')cmpOpen=false;if(e.key==='ArrowRight'){cmpCt=Math.round(cmpCf)+1;e.stopPropagation()}if(e.key==='ArrowLeft'){cmpCt=Math.round(cmpCf)-1;e.stopPropagation()}},true);
