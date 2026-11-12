@@ -1857,7 +1857,15 @@ const vidTag=(f,poster,extra)=>'<video class="m3__foto" '+(extra||'')+' src="ass
 const MPH=id=>'assets/mapa3d/'+MFOTO[id]+(MFOTO[id].indexOf('.')>=0?'':'.jpg');
 let openTok=0;
 /* la tarjeta se muestra cuando la foto ya cargó, así no cambia de tamaño después de abrirse */
-function openInfo(src){const tok=++openTok,go=()=>{if(tok!==openTok)return;minfo.hidden=false;document.body.classList.add('mapinfo')};if(!src)return go();const im=new Image();im.onload=im.onerror=go;im.src=src;setTimeout(go,2500)}
+function openInfo(src,vid){const tok=++openTok,go=()=>{if(tok!==openTok)return;minfo.hidden=false;document.body.classList.add('mapinfo')};let need=0,got=0;const hit=()=>{if(++got>=need)go()};
+  if(src){need++;const im=new Image();im.onload=im.onerror=hit;im.src=src}
+  if(vid&&vid.readyState<3){need++;vid.addEventListener('canplay',hit,{once:true});vid.addEventListener('error',hit,{once:true})}
+  if(!need)return go();setTimeout(go,2500)}
+/* precarga de los videos del mapa: de a uno, cuando te acercás a la estación (así la tarjeta abre al instante) */
+const VIDS_ALL=[...new Set(Object.values(VID).concat('stand-fuego'))];let vidWarm=false;
+function warmVideos(){if(vidWarm)return;vidWarm=true;const box=document.createElement('div');box.style.cssText='position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none;overflow:hidden';document.body.appendChild(box);let k=0;
+  const next=()=>{if(k>=VIDS_ALL.length)return;const v=document.createElement('video');v.muted=true;v.preload='auto';v.playsInline=true;v.src='assets/video-mapa/'+VIDS_ALL[k++]+'.mp4';let done=false;const fin=()=>{if(done)return;done=true;setTimeout(next,120)};v.addEventListener('canplaythrough',fin,{once:true});v.addEventListener('error',fin,{once:true});setTimeout(fin,9000);box.appendChild(v)};next()}
+ticks.push(()=>{if(vidWarm||!mapReady||cur<0||!ST[cur])return;const ei=ST.findIndex(x=>x.id==='espacios');if(ei>=0&&cur>=ei-3)warmVideos()});
 /* mapa de dos caras: Sectores (cara 0) / Espacios (cara 1). Siguiente gira la placa; el siguiente Siguiente pasa de estación */
 const MF={face:0,busy:false,flipping:false,go:null};window.__mapFlip=to=>MF.go&&MF.go(to);window.__MF=MF;
 {const st=document.createElement('style');st.textContent='.m3__foto[hidden]{display:none!important}#minfo video.m3__foto{background:#000}#tbtn,#tx,#thint,#tjoy{display:none!important}';document.head.appendChild(st)}
@@ -1869,7 +1877,7 @@ function standGallery(d){let i=STAND_START[d.p.id]||0;
   function show(j){i=(j+STANDS.length)%STANDS.length;const st=STANDS[i],isV=st.k==='fuego';img.src='assets/stands/'+st.k+'.webp';img.hidden=isV;vid.hidden=!isV;if(isV){vid.currentTime=0;vid.play().catch(()=>{})}else vid.pause();tag.textContent=st.n;minfo.style.setProperty('--c',st.c);[...dots.children].forEach((b,k)=>b.classList.toggle('a',k===i))}
   minfo.querySelector('.stg__p').onclick=()=>show(i-1);minfo.querySelector('.stg__n').onclick=()=>show(i+1);
   minfo.querySelector('.m3__x2').onclick=minfo.querySelector('.m3__vuelta').onclick=closeInfo;
-  minfo.hidden=true;show(i);openInfo(img.src)}
+  minfo.hidden=true;show(i);openInfo(img.src,STANDS[i].k==='fuego'?vid:null)}
 function selectPin(d){if(/^stands/.test(d.p.id))return standGallery(d);const p=Object.assign({},d.p,PIN_NAME[d.p.id]?{n:PIN_NAME[d.p.id]}:{}),C=window.BIOFERIA,cats=((C&&C.areas&&C.areas.categorias)||[]).map((c,i)=>({n:c.n,i:i+1,l:c.lugar})).filter(c=>(p.lugar&&c.l===p.lugar)||(p.cat&&c.n===p.cat));
   const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   minfo.style.setProperty('--c',(pinColors()[p.id])||M3.CSS[p.c]);/* el soporte del texto toma el color de la luz del sector */
@@ -1877,7 +1885,7 @@ function selectPin(d){if(/^stands/.test(d.p.id))return standGallery(d);const p=O
     '<p class="m3__tag">'+esc(MVERBO[p.c])+'</p><h3>'+esc(p.n)+'</h3>'+(cats.length?'<p class="m3__lbl">Categorías que viven acá</p><ul>'+cats.map(c=>'<li><b>'+String(c.i).padStart(2,'0')+'</b>'+esc(c.n)+'</li>').join('')+'</ul>':'<p class="m3__nota">'+esc(p.nota||'')+'</p>')+
     '<button type="button" class="m3__vuelta">Cerrar</button>';
   minfo.querySelector('.m3__x2').onclick=minfo.querySelector('.m3__vuelta').onclick=closeInfo;
-  minfo.hidden=true;openInfo(MFOTO[p.id]?MPH(p.id):null)}
+  minfo.hidden=true;openInfo(MFOTO[p.id]?MPH(p.id):null,VID[p.id]?minfo.querySelector('video'):null)}
 const pinGroup=new THREE.Group(),pinHits=[],pinGroupB=new THREE.Group(),pinHitsB=[];
 const beamTex=(()=>{const c=canvas(8,128),x=c.getContext('2d'),g=x.createLinearGradient(0,128,0,0);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.55,'rgba(255,255,255,.35)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,8,128);return new THREE.CanvasTexture(c)})();
 function pillLabel(text,world){const c=canvas(8,8),x=c.getContext('2d'),f='400 44px Inter,sans-serif';x.font=f;const w=Math.ceil(x.measureText(text).width+48),h=76;c.width=w;c.height=h;
