@@ -1016,7 +1016,7 @@ station({id:'editorial',az:D(172),R:27,y:-.8,title:'Diseño editorial',text:'Lib
     const nm=label(r.n,{size:44,world:r.n.length>12?.085:.11,spacing:.22});nm.position.set(0,-.9,0);nm.userData.ed=r.ed;g1.add(m,nm);
     const col=i%3,row=Math.floor(i/3);g1.scale.setScalar(2.8);edRow.add(g1);edG.push(g1);edHits.push(m,nm);
     /* una sola fila, una pieza al lado de la otra (en pantallas verticales, dos filas para que se lean) */
-    ticks.push(t=>{const wide=camera.aspect>1.15,bx=wide?(i-2.5)*4.05:((i%2)-.5)*3.5,by0=wide?-.1:3.1-Math.floor(i/2)*3.5;g1.userData.s=wide?2.8:2.05;g1.position.x=bx;g1.position.y=by0+Math.sin(t*.6+i*1.3)*.1;g1.rotation.y=Math.sin(t*.42+i*.9)*.07})});
+    ticks.push(t=>{const E=window.EDR=window.EDR||{a:0,l:0};if(i===0){const dt=Math.min(.1,Math.max(0,t-E.l));E.l=t;E.a+=dt*.35}const wide=camera.aspect>1.15,Rr=wide?3.6:3.1,a=E.a+i/6*Math.PI*2;g1.userData.s=wide?1.45:1.5;g1.position.x=Math.cos(a)*Rr*(wide?1.3:1);g1.position.y=-.9+Math.sin(a)*Rr+Math.sin(t*.6+i*1.3)*.06;g1.rotation.y=Math.sin(t*.42+i*.9)*.07})});
   /* colores plenos: sin niebla sobre las piezas (la niebla clara las desteñía) */
   {let mats=null,last=null;ticks.push(()=>{if(!mats){mats=[];g.traverse(o=>{[].concat(o.material||[]).forEach(m=>{if(m&&m.fog!==undefined&&mats.indexOf(m)<0)mats.push(m)})})}
     edRow.visible=!(cur>=0&&!!ST[cur]&&ST[cur].id==='graficas');/* en Gráficas audiovisuales no se ven las tapas de la estación vecina */
@@ -2414,8 +2414,8 @@ ticks.push(t=>{
   $d('apx').style.display=(DESC.mode==='scroll'&&DESC.apAny()&&!['pv','jg','jq','fin'].some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('on')}))?'flex':'none';
   DESC.apK=(DESC.apK||0)+((apOpen?1:0)-(DESC.apK||0))*Math.min(1,dtL*5);
   /* pósters: el ser va al centro del anillo y los pósters giran a su alrededor */
-  {const isP=DESC.mode==='scroll'&&!!ST[cur]&&ST[cur].id==='posteres';DESC.posK=(DESC.posK||0)+((isP?1:0)-(DESC.posK||0))*Math.min(1,dtL*2.6);
-   if(DESC.posK>.002){const pg=ST.find(q=>q.id==='posteres');if(pg&&pg.g){pg.g.getWorldPosition(_pw);_pw.y+=.8;_p.lerp(_pw,DESC.posK*DESC.posK*(3-2*DESC.posK))}}}
+  {const isP=DESC.mode==='scroll'&&!!ST[cur]&&(ST[cur].id==='posteres'||ST[cur].id==='editorial');if(isP)DESC.posId=ST[cur].id;DESC.posK=(DESC.posK||0)+((isP?1:0)-(DESC.posK||0))*Math.min(1,dtL*2.6);
+   if(DESC.posK>.002){const pg=ST.find(q=>q.id===DESC.posId);if(pg&&pg.g){pg.g.getWorldPosition(_pw);_pw.y+=(DESC.posId==='editorial'?-.9:.8);_p.lerp(_pw,DESC.posK*DESC.posK*(3-2*DESC.posK))}}}
   if(!DESC.lifeOn||DESC.mode==='born'||DESC.mode==='return'||DESC.mode==='unborn'){lifeP.copy(_p);lifeV.set(0,0,0);DESC.lifeOn=true}
   else{_tmp.copy(_p).sub(lifeP);lifeV.addScaledVector(_tmp,17.6*dtL).addScaledVector(lifeV,-8.4*dtL);lifeP.addScaledVector(lifeV,dtL)}
   if(cur!==DESC.lastCur){if(DESC.lastCur!==undefined&&DESC.mode==='scroll')lifeV.y+=2.4;DESC.lastCur=cur}
@@ -2423,7 +2423,7 @@ ticks.push(t=>{
   const lean=clamp(DESC.vus*.06,-.4,.4),breathe=1+.045*Math.sin(t*1.7)+Math.pow(Math.max(0,Math.sin(t*1.05)),6)*.07,stretch=1+clamp(Math.abs(DESC.vus)*.03,0,.18);
   _p2.copy(lifeP);_p2.x+=(DESC.mx||0)*.12;_p2.y-=(DESC.my||0)*.08;
   sdG.position.copy(_p2);wgD.position.copy(_p2);
-  const skN=Math.max(.001,scl*breathe*(dist/5.2)*(1-DESC.apK)),pK=DESC.posK||0,sk=Math.max(.001,skN+(1.05*breathe*(1-DESC.apK)-skN)*(pK*pK*(3-2*pK)));sdG.scale.set(sk/Math.sqrt(stretch),sk*stretch,sk/Math.sqrt(stretch));wgD.scale.setScalar(sk);
+  const skN=Math.max(.001,scl*breathe*(dist/5.2)*(1-DESC.apK)),pK=DESC.posK||0,sk=Math.max(.001,skN+((DESC.posId==='editorial'?.5:1.05)*breathe*(1-DESC.apK)-skN)*(pK*pK*(3-2*pK)));sdG.scale.set(sk/Math.sqrt(stretch),sk*stretch,sk/Math.sqrt(stretch));wgD.scale.setScalar(sk);
   const hide=scl*(1-DESC.apK)<.02;sdG.visible=wgD.visible=!hide;
   /* gira sobre su propio eje; al desintegrarse gira más rápido */
   const bu=DESC.mode==='born'||DESC.mode==='unborn',spin=bu?Math.sin(smD(.2,3.4,age)*Math.PI)*6:0;sdG.rotation.y=t*.75+spin*.5+(bu?age*1.2:0);sdG.rotation.x=.18+Math.sin(t*.4)*.05+(DESC.my||0)*.25;sdG.rotation.z=-.12-(DESC.mx||0)*.2-lean;
