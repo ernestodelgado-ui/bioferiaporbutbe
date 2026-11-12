@@ -78,6 +78,8 @@
   #fin b{display:block;font-weight:300;font-size:clamp(28px,5vw,78px);letter-spacing:.2em;padding-left:.2em;text-transform:uppercase;background:linear-gradient(90deg,#FA3710,#FED108,#01DAC7,#2f7bff,#FF0099);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(255,255,255,.28))}
   #word.rb b{background:linear-gradient(90deg,#FA3710,#FED108,#01DAC7,#2f7bff,#FF0099);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 0 26px rgba(255,255,255,.32))}
   #word b{display:block;font-weight:400;font-size:clamp(40px,6.2vw,104px);letter-spacing:.26em;padding-left:.26em;color:var(--c);text-shadow:0 0 30px var(--c),0 0 80px var(--c)}
+  #word b img{display:inline-block;height:auto;filter:drop-shadow(0 0 8px var(--c)) drop-shadow(0 0 26px var(--c)) drop-shadow(0 0 64px var(--c))}
+  #word b img[alt=TRANSFORMAR]{filter:brightness(1.9) saturate(.9) drop-shadow(0 0 5px var(--c)) drop-shadow(0 0 16px var(--c))}
   #word span{display:block;margin:12px auto 0;max-width:520px;font-size:clamp(14px,1.3vw,18px);letter-spacing:.05em;color:rgba(255,255,255,.78);line-height:1.5;text-shadow:0 0 12px rgba(0,0,0,.8)}
   body.tkopen #cap{left:56vw;right:auto;top:48%;transform:translateY(-50%);text-align:left;width:min(560px,36vw)}
   body.tkopen #cap h2{font-size:clamp(48px,5.2vw,96px)}
@@ -578,11 +580,13 @@ const PAL=[
   {w:'CUIDAR',c:COL.tierra,d:'Sostén, permanencia y condición para que algo crezca.'},
   {w:'CELEBRAR',c:COL.rosa,d:'El punto de encuentro donde las acciones individuales adquieren sentido colectivo.'}];
 const wordEl=document.getElementById('word'),wTxt=wordEl.querySelector('b'),wDesc=wordEl.querySelector('span'),_tcol=new THREE.Color();
+const WIMG={HACER:['hacer',22],CUIDAR:['cuidar',24],TRANSFORMAR:['transformar',40],CONECTAR:['conectar',30],CELEBRAR:['celebrar',24]};
+function setWord(w){const m=WIMG[w];if(m)wTxt.innerHTML='<img src="assets/palabras/'+m[0]+'.png" alt="'+w+'" style="width:min(88vw,max('+m[1]+'vw,'+m[1]*9+'px))">';else wTxt.textContent=w}
 let wShown=-2,seqStart=0,wasAtSeed=false,svHeart=0,seqOn=false,afterConcept=false;
 function seqIndex(){const at=cur===seedIdx&&seqOn;if(at&&!wasAtSeed)seqStart=tNow;wasAtSeed=at;
   const t=at?tNow-seqStart:0,idx=at&&t>4.4?Math.min(4,Math.floor((t-4.4)/5)):-1;
   if(idx!==wShown){wShown=idx;wordEl.classList.remove('on');
-    if(idx>=0)setTimeout(()=>{if(wShown!==idx)return;wTxt.textContent=PAL[idx].w;wDesc.textContent=PAL[idx].d;wordEl.style.setProperty('--c',PAL[idx].c);wordEl.classList.add('on')},550)}
+    if(idx>=0)setTimeout(()=>{if(wShown!==idx)return;setWord(PAL[idx].w);wDesc.textContent=PAL[idx].d;wordEl.style.setProperty('--c',PAL[idx].c);wordEl.classList.add('on')},550)}
   return Math.max(0,idx)}
 window.__seq=t=>{seqStart=tNow-t};
 function updateSeedVideo(it,sd,dt){if(it>.001&&!svStarted){svStarted=true;if(window.__ldGo)setTimeout(window.__ldGo,1500);sv.currentTime=0;sv.play().catch(()=>{})}
@@ -597,7 +601,7 @@ function updateSeedVideo(it,sd,dt){if(it>.001&&!svStarted){svStarted=true;if(win
 let finale=false,finaleK=0;let seedStep=0,seedFlameT0=-99,seedMergeT0=-99,seedBornStarted=false,seedWord=-1;
 /* después de nacer la forma: un toque por palabra (mismo orden del manifiesto); la palabra aparece arriba y se apaga, y la forma toma el color del poder */
 const SPKW=[{w:'HACER',c:COL.fuego},{w:'CUIDAR',c:COL.tierra},{w:'TRANSFORMAR',c:'#2f7bff'},{w:'CONECTAR',c:COL.aire},{w:'CELEBRAR',c:COL.rosa}];
-function showSeedWord(i){wordEl.classList.remove('on','rb');if(i<0)return;setTimeout(()=>{if(seedWord!==i||cur!==seedIdx)return;wTxt.textContent=SPKW[i].w;wDesc.textContent='';wordEl.style.setProperty('--c',SPKW[i].c);wordEl.classList.add('on');setTimeout(()=>{if(seedWord===i)wordEl.classList.remove('on')},4200)},350)}
+function showSeedWord(i){wordEl.classList.remove('on','rb');if(i<0)return;setTimeout(()=>{if(seedWord!==i||cur!==seedIdx)return;setWord(SPKW[i].w);wDesc.textContent='';wordEl.style.setProperty('--c',SPKW[i].c);wordEl.classList.add('on');setTimeout(()=>{if(seedWord===i)wordEl.classList.remove('on')},4200)},350)}
 const SPK=[
   {c:COL.fuego,ax:2.5,bx:1.0,ay:1.1,by:.5,az:.9,w:[.61,1.7,.83,2.1,.7],p:[0,1,2,3,4],cy:.6},
   {c:COL.aire,ax:3.1,bx:.8,ay:1.3,by:.4,az:.8,w:[.9,2.3,1.17,1.9,.55],p:[2,5,1,4,0],cy:.7},
