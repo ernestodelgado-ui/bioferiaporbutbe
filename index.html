@@ -1763,7 +1763,7 @@ function go(i){
   U.th=U.ph=0;U.r=1;U.f.set(0,0,0);
   cap.classList.remove('on');document.body.classList.toggle('st-pos',s.id==='posteres');
   setTimeout(()=>{if(cur!==i)return;if(s.id==='seed'&&noCapSeed)return;
-    if(s.id==='agencia'){const h=cap.querySelector('h2');h.innerHTML='<img class="cbt cbt-l" src="assets/palabras/concepto-bioferia-claro.png" alt="Concepto Bioferia"><img class="cbt cbt-d" src="assets/palabras/concepto-bioferia-oscuro.png" alt="Concepto Bioferia">'}else cap.querySelector('h2').textContent=s.title;cap.querySelector('p').textContent=s.text;cap.classList.add('on');if(s.id==='seed')setTimeout(()=>{if(cur===i)cap.classList.remove('on')},4200)},450);
+    if(s.id==='agencia'){const h=cap.querySelector('h2');h.style.cssText='width:96vw;margin-left:calc(50% - 48vw)';h.innerHTML='<img class="cbt cbt-l" src="assets/palabras/concepto-bioferia-claro.png" alt="Concepto Bioferia"><img class="cbt cbt-d" src="assets/palabras/concepto-bioferia-oscuro.png" alt="Concepto Bioferia">'}else{const h=cap.querySelector('h2');h.style.cssText='';h.textContent=s.title}cap.querySelector('p').textContent=s.text;cap.classList.add('on');if(s.id==='seed')setTimeout(()=>{if(cur===i)cap.classList.remove('on')},4200)},450);
   [...dots.children].forEach((d,k)=>d.classList.toggle('a',k===i));
   next.textContent=i===ST.length-1?'Volver al inicio ↺':'Siguiente →'}
 const dots=document.getElementById('dots'),next=document.getElementById('next');
