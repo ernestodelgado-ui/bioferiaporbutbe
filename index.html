@@ -598,7 +598,7 @@ const PAL=[
   {w:'CELEBRAR',c:COL.rosa,d:'El punto de encuentro donde las acciones individuales adquieren sentido colectivo.'}];
 const wordEl=document.getElementById('word'),wTxt=wordEl.querySelector('b'),wDesc=wordEl.querySelector('span'),_tcol=new THREE.Color();
 const WIMG={HACER:['hacer',3.52,1],CUIDAR:['cuidar',3.53,1],TRANSFORMAR:['transformar',8.02,1],CONECTAR:['conectar',5.67,1],CELEBRAR:['celebrar',4.57,1.3]};
-function setWord(w){const m=WIMG[w];if(m)wTxt.innerHTML='<img src="assets/palabras/'+m[0]+'.png" alt="'+w+'" style="width:min(92vw,calc(max(8vw,40px)*'+(m[1]*m[2])+'))">';else wTxt.textContent=w}
+function setWord(w){const m=null;if(m)wTxt.innerHTML='<img src="assets/palabras/'+m[0]+'.png" alt="'+w+'" style="width:min(92vw,calc(max(8vw,40px)*'+(m[1]*m[2])+'))">';else wTxt.textContent=w}
 let wShown=-2,seqStart=0,wasAtSeed=false,svHeart=0,seqOn=false,afterConcept=false;
 function seqIndex(){const at=cur===seedIdx&&seqOn;if(at&&!wasAtSeed)seqStart=tNow;wasAtSeed=at;
   const t=at?tNow-seqStart:0,idx=at&&t>4.4?Math.min(4,Math.floor((t-4.4)/5)):-1;
