@@ -146,8 +146,8 @@
   @media (max-width:900px){#wqr{width:120px;right:12px}body.wqr #wv{left:50%!important;width:min(92vw,calc((100vh - 112px)*1.7778))!important}}
   #tvskip{position:fixed;right:22px;top:22px;z-index:70;display:none}#tvskip.on{display:block}
   #intro{position:fixed;inset:0;z-index:60;background:#050507;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;transition:opacity .9s}
-  #iv.crt1,#sv.crt1{transition:transform .45s cubic-bezier(.8,0,1,.55),filter .45s;transform:scaleY(.01);filter:brightness(4) saturate(0) drop-shadow(0 0 18px #fff)}
-  #iv.crt2,#sv.crt2{transition:transform .32s ease-in,opacity .32s;transform:scale(0,.01);opacity:.8;filter:brightness(4) saturate(0) drop-shadow(0 0 18px #fff)}
+  #iv.crt1,#sv.crt1,#fvv.crt1{transition:transform .45s cubic-bezier(.8,0,1,.55),filter .45s;transform:scaleY(.01);filter:brightness(4) saturate(0) drop-shadow(0 0 18px #fff)}
+  #iv.crt2,#sv.crt2,#fvv.crt2{transition:transform .32s ease-in,opacity .32s;transform:scale(0,.01);opacity:.8;filter:brightness(4) saturate(0) drop-shadow(0 0 18px #fff)}
   #intro.off{opacity:0;pointer-events:none}
   #intro video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:none;background:#000}
   #intro.play #iv,#intro video.show{display:block}
@@ -771,13 +771,27 @@ window.__seed=(a,b,c,d,e)=>{scrIdx=e===undefined?-1:e;seedStep=a;seedWord=b;catS
 /* final: después del juego, un clic vuelve al centro con la forma y las luces de las estaciones giran a su alrededor; otro clic lleva al cierre */
 const finEl=document.getElementById('fin');let endScr=false;
 function endOff(){endScr=false;finEl.classList.remove('on')}
+/* después de Gracias: video de la publicidad de Bioferia en pantalla completa (se enciende y se apaga como la tele del inicio); al terminar, el centro con las luces y 'Activemos el cambio' */
+let finalVid=false;
+const fvEl=document.createElement('div'),fvv=document.createElement('video'),fvSkip=document.createElement('button');let fOff=false;
+fvEl.id='fvid';fvEl.style.cssText='position:fixed;inset:0;z-index:61;background:#000;display:none;opacity:0;transition:opacity .6s';
+fvv.id='fvv';fvv.playsInline=true;fvv.setAttribute('playsinline','');fvv.preload='auto';fvv.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000';
+fvSkip.className='pill ghost';fvSkip.textContent='Saltar →';fvSkip.style.cssText='position:absolute;right:26px;bottom:26px;z-index:2';fvEl.append(fvv,fvSkip);document.body.appendChild(fvEl);
+function playFinalVideo(){finalVid=true;fOff=false;fvv.classList.remove('crt1','crt2');fvv.style.display='block';fvEl.style.display='block';requestAnimationFrame(()=>requestAnimationFrame(()=>{fvEl.style.opacity=1}));fvv.src='media/bioferia-final.mp4';fvv.currentTime=0;fvv.muted=false;fvv.volume=1;fvv.play().catch(()=>{fvv.muted=true;fvv.play().catch(finalOff)})}
+/* al terminar: se apaga como la tele (línea, punto) y vuelve al centro con las luces */
+function finalOff(){if(!finalVid||fOff)return;fOff=true;sfx();fvv.pause();fvv.classList.add('crt1');
+  setTimeout(()=>{fvv.classList.remove('crt1');fvv.classList.add('crt2')},480);
+  setTimeout(()=>{fvv.style.display='none';dotEl.classList.add('on')},820);
+  setTimeout(()=>{fvEl.style.opacity=0;setTimeout(()=>{fvEl.style.display='none';fvv.removeAttribute('src');fvv.load()},700);setTimeout(()=>dotEl.classList.remove('on'),900);finalVid=false;fOff=false;showEndScreen()},1500)}
+fvv.addEventListener('ended',finalOff);fvv.addEventListener('error',()=>{if(finalVid)finalOff()});fvSkip.onclick=finalOff;addEventListener('keydown',e=>{if(e.key==='Escape'&&finalVid)finalOff()});
+function showEndScreen(){endScr=true;noCapSeed=true;seqOn=false;seedStep=2;seedWord=-1;catStep=0;elStep=0;seedMergeT0=tNow-10;seedFlameT0=tNow-10;wordEl.classList.remove('on');go(seedIdx);next.textContent='Volver a empezar ↺';setTimeout(()=>{if(endScr&&cur===seedIdx)finEl.classList.add('on')},2200)}
 function seedAdvance(dir){if(!started)return false;if(window.__tvOn)return true;
   if(cur>=0&&ST[cur]&&ST[cur].id==='espacios'&&mapReady&&MF.go){if(MF.busy)return true;if(dir>0&&MF.face===0){MF.go(1);return true}if(dir<0&&MF.face===1){MF.go(0);return true}}
   {if(window.__OPEN&&window.__OPEN.on)return true;const D=window.__DESC;if(D&&['born','hold','return','unborn'].includes(D.mode)){if(dir>0){if(D.mode==='hold')D.startScroll();else if(D.mode==='return')D.unborn()}return true}}
   if(cur>=0&&ST[cur]&&ST[cur].id==='marketing'&&window.mktStage!==undefined){if(dir>0&&mktStage===0){mktStage=1;return true}if(dir<0&&mktStage===1&&!igOpen&&!tkOpen&&!ytOpen&&!mvOpen){mktStage=0;return true}}
   const jIdx=ST.findIndex(s=>s.id==='juego'),cIdx=ST.findIndex(s=>s.id==='cierre');
   /* después del cierre: la llama del inicio con "Activemos el cambio" (sin la secuencia del concepto); otro clic vuelve a empezar */
-  if(dir>0&&cur===cIdx&&cIdx>=0){endScr=true;noCapSeed=true;seqOn=false;seedStep=2;seedWord=-1;catStep=0;elStep=0;seedMergeT0=tNow-10;seedFlameT0=tNow-10;wordEl.classList.remove('on');go(seedIdx);next.textContent='Volver a empezar ↺';setTimeout(()=>{if(endScr&&cur===seedIdx)finEl.classList.add('on')},2200);return true}
+  if(dir>0&&cur===cIdx&&cIdx>=0){playFinalVideo();return true}
   if(endScr&&cur===seedIdx){if(dir>0){endOff();noCapSeed=false;seqOn=true;wasAtSeed=false;go(seedIdx)}else{endOff();go(cIdx)}return true}
   if(dir>0&&cur===jIdx&&cIdx>=0){finale=true;noCapSeed=true;seedStep=2;seedWord=-1;catStep=0;elStep=0;seedMergeT0=tNow-10;seedFlameT0=tNow-10;wordEl.classList.remove('on');go(seedIdx);return true}
   if(finale&&cur===seedIdx){if(dir>0){finale=false;go(cIdx)}else{finale=false;go(jIdx)}return true}
