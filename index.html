@@ -777,7 +777,7 @@ const fvEl=document.createElement('div'),fvv=document.createElement('video'),fvS
 fvEl.id='fvid';fvEl.style.cssText='position:fixed;inset:0;z-index:61;background:#000;display:none;opacity:0;transition:opacity .6s';
 fvv.id='fvv';fvv.playsInline=true;fvv.setAttribute('playsinline','');fvv.preload='auto';fvv.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000';
 fvSkip.className='pill ghost';fvSkip.textContent='Saltar →';fvSkip.style.cssText='position:absolute;right:26px;bottom:26px;z-index:2';fvEl.append(fvv,fvSkip);document.body.appendChild(fvEl);
-function playFinalVideo(){finalVid=true;fOff=false;fvv.classList.remove('crt1','crt2');fvv.style.display='block';fvEl.style.display='block';requestAnimationFrame(()=>requestAnimationFrame(()=>{fvEl.style.opacity=1}));fvv.src='media/bioferia-final.mp4';fvv.currentTime=0;fvv.muted=false;fvv.volume=1;fvv.play().catch(()=>{fvv.muted=true;fvv.play().catch(finalOff)})}
+function playFinalVideo(){finalVid=true;fOff=false;if(window.__cierreStop)window.__cierreStop();document.querySelectorAll('audio,video').forEach(m=>{if(m!==fvv&&!m.paused&&!m.muted&&m.volume>0)m.pause()});fvv.classList.remove('crt1','crt2');fvv.style.display='block';fvEl.style.display='block';requestAnimationFrame(()=>requestAnimationFrame(()=>{fvEl.style.opacity=1}));fvv.src='media/bioferia-final.mp4';fvv.currentTime=0;fvv.muted=false;fvv.volume=1;fvv.play().catch(()=>{fvv.muted=true;fvv.play().catch(finalOff)})}
 /* al terminar: se apaga como la tele (línea, punto) y vuelve al centro con las luces */
 function finalOff(){if(!finalVid||fOff)return;fOff=true;sfx();fvv.pause();fvv.classList.add('crt1');
   setTimeout(()=>{fvv.classList.remove('crt1');fvv.classList.add('crt2')},480);
@@ -1589,7 +1589,7 @@ station({id:'cierre',az:0,R:0,y:26,title:'Cierre',text:'Gracias por recorrer el 
       if(p<1){const gx=sx0+(ex/SW)*sw,gy=sy0+sh*.62,rg=x.createRadialGradient(gx,gy,0,gx,gy,34);rg.addColorStop(0,'rgba(255,110,110,.95)');rg.addColorStop(1,'rgba(255,45,61,0)');x.fillStyle=rg;x.fillRect(gx-34,gy-34,68,68)}}
     x.globalAlpha=1};
   /* arranque, repetición y salto con un toque */
-  let state='idle',t0=0,offAt=0,off=0,skip=false,lastKey='',aud=null;const AUD_END=80,AUD_FADE=4;/* el audio suena desde que empieza el manifiesto hasta 1:20, con fade al final */
+  let state='idle',t0=0,offAt=0,off=0,skip=false,lastKey='',aud=null;window.__cierreStop=()=>{if(aud)aud.pause()};const AUD_END=80,AUD_FADE=4;/* el audio suena desde que empieza el manifiesto hasta 1:20, con fade al final */
   const reset=()=>{x.clearRect(0,0,W,H);tex.needsUpdate=true;lastKey='';off=0;skip=false};
   cv.addEventListener('pointerup',e=>{if(state==='run'&&cur>=0&&ST[cur].id==='cierre'&&dnC&&Math.hypot(e.clientX-dnC.x,e.clientY-dnC.y)<6)skip=true});let dnC=null;cv.addEventListener('pointerdown',e=>{dnC={x:e.clientX,y:e.clientY}});
   ticks.push(t=>{document.body.classList.toggle('cierre',cur>=0&&ST[cur].id==='cierre');/* en el cierre se ve solo el texto: sin título ni contador */
@@ -1791,7 +1791,7 @@ function go(i){
   setTimeout(()=>{if(cur!==i)return;if(s.id==='seed'&&noCapSeed)return;
     const TI=null;if(TI){const h=cap.querySelector('h2');h.style.cssText='width:96vw;margin-left:calc(50% - 48vw)';h.innerHTML='<img class="cbt'+TI[2]+'" src="assets/palabras/'+TI[0]+'.png" alt="'+TI[1]+'">'}else{const h=cap.querySelector('h2');h.style.cssText='';h.textContent=s.title}cap.querySelector('p').textContent=s.text;cap.classList.add('on');if(s.id==='seed')setTimeout(()=>{if(cur===i)cap.classList.remove('on')},4200)},450);
   [...dots.children].forEach((d,k)=>d.classList.toggle('a',k===i));
-  next.textContent=i===ST.length-1?'Volver al inicio ↺':'Siguiente →'}
+  next.textContent=i===ST.length-1&&s.id!=='cierre'?'Volver al inicio ↺':'Siguiente →'}
 const dots=document.getElementById('dots'),next=document.getElementById('next');
 function buildDots(){ST.forEach((s,i)=>{const d=document.createElement('i');d.title=s.title;d.onclick=()=>go(i);dots.appendChild(d)})}
 
