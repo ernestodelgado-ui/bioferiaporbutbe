@@ -776,21 +776,31 @@ let finalVid=false;
 /* música de fondo, suave: arranca cuando termina el video de Capitán Planeta, sigue en loop por las estaciones y se apaga sola en el juego (y no vuelve en el cierre) */
 const BGM=new Audio('media/musica-fondo.mp3');BGM.loop=true;BGM.preload='auto';BGM.volume=0;let bgmOn=false,bgmT=performance.now();const BGM_VOL=.072;
 window.__bgmStart=()=>{bgmOn=true};window.__bgm=BGM;
-ticks.push(()=>{const now=performance.now(),dt=Math.min(.1,(now-bgmT)/1000);bgmT=now;if(!bgmOn)return;const id=cur>=0&&ST[cur]?ST[cur].id:'';const want=!(id==='juego'||id==='cierre'||finalVid||endScr);const tg=want?BGM_VOL:0;BGM.volume=Math.max(0,Math.min(1,BGM.volume+(tg-BGM.volume)*(1-Math.exp(-dt*(want?.8:2.2)))));if(want&&BGM.paused)BGM.play().catch(()=>{});else if(!want&&!BGM.paused&&BGM.volume<.004)BGM.pause()});
+ticks.push(()=>{const now=performance.now(),dt=Math.min(.1,(now-bgmT)/1000);bgmT=now;if(!bgmOn)return;const id=cur>=0&&ST[cur]?ST[cur].id:'';const want=!(id==='juego'||id==='cierre'||(finalVid&&fsIsFinal));/* la música se apaga desde el juego y vuelve en el final (Activemos el cambio) */const tg=want?BGM_VOL:0;BGM.volume=Math.max(0,Math.min(1,BGM.volume+(tg-BGM.volume)*(1-Math.exp(-dt*(want?.8:2.2)))));if(want&&BGM.paused)BGM.play().catch(()=>{});else if(!want&&!BGM.paused&&BGM.volume<.004)BGM.pause()});
 const fvEl=document.createElement('div'),fvv=document.createElement('video'),fvSkip=document.createElement('button');let fOff=false;
 fvEl.id='fvid';fvEl.style.cssText='position:fixed;inset:0;z-index:61;background:#000;display:none;opacity:0;transition:opacity .6s';
 fvv.id='fvv';fvv.playsInline=true;fvv.setAttribute('playsinline','');fvv.preload='auto';fvv.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000';
 fvSkip.className='pill ghost';fvSkip.textContent='Saltar →';fvSkip.style.cssText='position:absolute;right:26px;bottom:26px;z-index:2';fvEl.append(fvv,fvSkip);document.body.appendChild(fvEl);
-function playFinalVideo(){finalVid=true;fOff=false;if(window.__cierreStop)window.__cierreStop();document.querySelectorAll('audio,video').forEach(m=>{if(m!==fvv&&!m.paused&&!m.muted&&m.volume>0)m.pause()});fvv.classList.remove('crt1','crt2');fvv.style.display='block';fvEl.style.display='block';requestAnimationFrame(()=>requestAnimationFrame(()=>{fvEl.style.opacity=1}));fvv.src='media/bioferia-final.mp4';fvv.currentTime=0;fvv.muted=false;fvv.volume=1;fvv.play().catch(()=>{fvv.muted=true;fvv.play().catch(finalOff)})}
+let fsDone=null,stdStage=0,fsIsFinal=false;
+function playFinalVideo(){playFS('media/bioferia-final.mp4',null)}
+function playFS(src,done){fsDone=done;fsIsFinal=src.indexOf('bioferia-final')>=0;finalVid=true;fOff=false;if(window.__cierreStop)window.__cierreStop();document.querySelectorAll('audio,video').forEach(m=>{if(m!==fvv&&!m.paused&&!m.muted&&m.volume>0)m.pause()});fvv.classList.remove('crt1','crt2');fvv.style.display='block';fvEl.style.display='block';requestAnimationFrame(()=>requestAnimationFrame(()=>{fvEl.style.opacity=1}));if(fvv.getAttribute('src')!==src)fvv.src=src;fvv.currentTime=0;fvv.muted=false;fvv.volume=1;fvv.play().catch(()=>{fvv.muted=true;fvv.play().catch(finalOff)})}
+/* MAPA (Espacios): un clic abre el video de los stands a pantalla completa; al terminar vuelve al mapa y el siguiente clic gira el mapa */
+function spHere(){return cur>=0&&!!ST[cur]&&ST[cur].id==='espacios'&&mapReady&&!!MF.go}
+function spStep(dir){if(!spHere())return false;if(finalVid||MF.busy)return true;if(dir>0&&MF.face===0){if(stdStage===0){stdStage=1;playFS('media/stands.mp4',()=>{});return true}MF.go(1);return true}if(dir<0&&MF.face===1){MF.go(0);return true}return false}
+function spTap(){if(!spHere()||MF.busy||finalVid||MF.face!==0)return false;return spStep(1)}
+ticks.push(()=>{if(!(cur>=0&&ST[cur]&&ST[cur].id==='espacios')&&!finalVid)stdStage=0});
+/* precarga: los videos pesados se van bajando antes de llegar, para que abran de una */
+const PRE={};function preMedia(src){if(PRE[src])return;const v=document.createElement('video');v.muted=true;v.preload='auto';v.playsInline=true;v.style.cssText='position:fixed;left:-9999px;width:2px;height:2px;opacity:0;pointer-events:none';v.src=src;document.body.appendChild(v);v.load();PRE[src]=v}
+ticks.push(()=>{if(cur<0||!ST[cur])return;const id=ST[cur].id;if(['pictos','senaletica','espacios'].includes(id))preMedia('media/stands.mp4');if(['marketing','web','app','juego','cierre'].includes(id))preMedia('media/bioferia-final.mp4')});
 /* al terminar: se apaga como la tele (línea, punto) y vuelve al centro con las luces */
 function finalOff(){if(!finalVid||fOff)return;fOff=true;sfx();fvv.pause();fvv.classList.add('crt1');
   setTimeout(()=>{fvv.classList.remove('crt1');fvv.classList.add('crt2')},480);
   setTimeout(()=>{fvv.style.display='none';dotEl.classList.add('on')},820);
-  setTimeout(()=>{fvEl.style.opacity=0;setTimeout(()=>{fvEl.style.display='none';fvv.removeAttribute('src');fvv.load()},700);setTimeout(()=>dotEl.classList.remove('on'),900);finalVid=false;fOff=false;showEndScreen()},1500)}
+  setTimeout(()=>{fvEl.style.opacity=0;setTimeout(()=>{fvEl.style.display='none';fvv.removeAttribute('src');fvv.load()},700);setTimeout(()=>dotEl.classList.remove('on'),900);finalVid=false;fOff=false;const dn2=fsDone;fsDone=null;if(dn2)dn2();else showEndScreen()},1500)}
 fvv.addEventListener('ended',finalOff);fvv.addEventListener('error',()=>{if(finalVid)finalOff()});fvSkip.onclick=finalOff;addEventListener('keydown',e=>{if(e.key==='Escape'&&finalVid)finalOff()});
 function showEndScreen(){endScr=true;noCapSeed=true;seqOn=false;seedStep=2;seedWord=-1;catStep=0;elStep=0;seedMergeT0=tNow-10;seedFlameT0=tNow-10;wordEl.classList.remove('on');go(seedIdx);next.textContent='Volver a empezar ↺';setTimeout(()=>{if(endScr&&cur===seedIdx)finEl.classList.add('on')},2200)}
 function seedAdvance(dir){if(!started)return false;if(window.__tvOn)return true;
-  if(cur>=0&&ST[cur]&&ST[cur].id==='espacios'&&mapReady&&MF.go){if(MF.busy)return true;if(dir>0&&MF.face===0){MF.go(1);return true}if(dir<0&&MF.face===1){MF.go(0);return true}}
+  if(spStep(dir))return true;
   {if(window.__OPEN&&window.__OPEN.on)return true;const D=window.__DESC;if(D&&['born','hold','return','unborn'].includes(D.mode)){if(dir>0){if(D.mode==='hold')D.startScroll();else if(D.mode==='return')D.unborn()}return true}}
   if(cur>=0&&ST[cur]&&ST[cur].id==='marketing'&&window.mktStage!==undefined){if(dir>0&&mktStage===0){mktStage=1;return true}if(dir<0&&mktStage===1&&!igOpen&&!tkOpen&&!ytOpen&&!mvOpen){mktStage=0;return true}}
   const jIdx=ST.findIndex(s=>s.id==='juego'),cIdx=ST.findIndex(s=>s.id==='cierre');
@@ -2124,7 +2134,7 @@ window.__cmpOpen=()=>{cmpOpen=true};window.__pstOpen=()=>{pstOpen=true};window._
 function hitVideo(e){if(!agenciaMesh||cur<0||ST[cur].id!=='agencia'||!agenciaMesh.parent.parent.visible)return false;
   const r=cv.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-((e.clientY-r.top)/r.height)*2+1);ray.setFromCamera(ndc,camera);return ray.intersectObject(agenciaMesh).length>0}
 cv.addEventListener('pointerdown',e=>{dn={x:e.clientX,y:e.clientY}});
-cv.addEventListener('pointerup',e=>{if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6&&hitVideo(e))openVideo();else if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6&&hitGav(e))openGav();else if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6&&hitWeb(e))openWeb();else if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6&&hitApp(e)>=0)showApp(hitApp(e));else if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6&&hitJuego(e))openJg();else if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6&&hitPoster(e)>=0){const pi=hitPoster(e),dF=Math.abs(((pi-posCf)%POSC+POSC*1.5)%POSC-POSC/2);posPick(pi);if(dF>.6){window.__posHold=performance.now()+7000}else{if(pi%6===4)openFuego();else openPz(pi)}}else if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6){const d=hitPin(e);if(d)selectPin(d)}dn=null});
+cv.addEventListener('pointerup',e=>{if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6&&hitVideo(e))openVideo();else if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6&&hitGav(e))openGav();else if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6&&hitWeb(e))openWeb();else if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6&&hitApp(e)>=0)showApp(hitApp(e));else if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6&&hitJuego(e))openJg();else if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6&&hitPoster(e)>=0){const pi=hitPoster(e),dF=Math.abs(((pi-posCf)%POSC+POSC*1.5)%POSC-POSC/2);posPick(pi);if(dF>.6){window.__posHold=performance.now()+7000}else{if(pi%6===4)openFuego();else openPz(pi)}}else if(dn&&Math.hypot(e.clientX-dn.x,e.clientY-dn.y)<6){if(!spTap()){const d=hitPin(e);if(d)selectPin(d)}}dn=null});
 cv.addEventListener('pointermove',e=>{if(e.buttons)return;cv.style.cursor=(hitVideo(e)||hitGav(e)||hitWeb(e)||hitApp(e)>=0||hitJuego(e)||hitPoster(e)>=0||hitPin(e))?'pointer':''});
 
 /* ---------- arranque ---------- */
@@ -2372,8 +2382,7 @@ addEventListener('keydown',e=>{if(DESC.mode!=='scroll')return;const nx=['ArrowDo
     root.classList.toggle('on',here);
     sl.forEach((d,i)=>{d.classList.toggle('a',i===edSl&&here);const v=vids[i];if(v){if(i===edSl&&here){if(!v.src)v.src=v.dataset.src;if(v.paused)v.play().catch(()=>{})}else if(!v.paused)v.pause()}})})}
 /* ---------- mapa de dos caras en el modo scroll: Siguiente / ← giran la placa; con la cara final, pasan de estación ---------- */
-function mapGate(dir){if(window.__edGate&&window.__edGate(dir))return true;if(DESC.mode!=='scroll'||cur<0||!ST[cur]||ST[cur].id!=='espacios'||!mapReady||!MF.go)return false;
-  if(MF.busy)return true;if(dir>0&&MF.face===0){MF.go(1);return true}if(dir<0&&MF.face===1){MF.go(0);return true}return false}
+function mapGate(dir){if(window.__edGate&&window.__edGate(dir))return true;if(DESC.mode!=='scroll')return false;return spStep(dir)}
 {const css=document.createElement('style');css.textContent='#mnav{position:fixed;right:32px;bottom:40px;z-index:11;display:flex;gap:10px;opacity:0;pointer-events:none;transition:opacity .5s}#mnav.on{opacity:1;pointer-events:auto}#mnav .pill:disabled{opacity:.35;cursor:default;box-shadow:none}@media (max-width:700px){#mnav{right:16px;bottom:56px}}body.open #mnav{opacity:0!important;pointer-events:none!important}';document.head.appendChild(css);
   const nv=document.createElement('div');nv.id='mnav';nv.innerHTML='<button class="pill ghost" id="mprev" aria-label="Anterior">←</button><button class="pill" id="mnext">Siguiente →</button>';document.body.appendChild(nv);
   const stepMap=dir=>{if(DESC.mode!=='scroll')return;if(mapGate(dir))return;snapTo(snapI+dir)};
