@@ -1059,7 +1059,7 @@ station({id:'editorial',az:D(172),R:27,y:-.8,title:'Diseño editorial',text:'Lib
     ticks.push(t=>{const E=window.EDR=window.EDR||{a:0,l:0,v:0};if(i===0){const dt=Math.min(.1,Math.max(0,t-E.l));E.l=t;E.a+=dt*.5}const wide=camera.aspect>1.15,R=wide?4.1:2.6;const NE=EDP.length;let d=((i-E.a*NE/(Math.PI*2))%NE+NE*1.5)%NE-NE/2;const ph=d*Math.PI*2/NE,sel=Math.max(0,1-Math.abs(d)),ff=(Math.cos(ph)+1)/2,rr=R+1.3*sel,zz=Math.cos(ph)*rr;g1.position.set(Math.sin(ph)*rr,-.1-zz*.1+Math.sin(t*.6+i*1.3)*.03,zz*.92);g1.rotation.set(0,ph*.22,0);g1.userData.s=(wide?2.3:1.35)*(.82+.4*sel);m.scale.setScalar(1);nm.position.set(0,-1.05,0);const mt=m.material;if(mt){mt.color.setScalar(sel>0?1:.3+.6*Math.pow(ff,1.4))}if(nm.material){nm.material.transparent=true;nm.material.opacity=Math.max(.2,ff);nm.material.color.set('#ffffff')}})});
   /* colores plenos: sin niebla sobre las piezas (la niebla clara las desteñía) */
   {let mats=null,last=null;ticks.push(()=>{if(!mats){mats=[];g.traverse(o=>{[].concat(o.material||[]).forEach(m=>{if(m&&m.fog!==undefined&&mats.indexOf(m)<0)mats.push(m)})})}
-    edRow.visible=!(cur>=0&&!!ST[cur]&&ST[cur].id==='graficas');/* en Gráficas audiovisuales no se ven las tapas de la estación vecina */
+    edRow.visible=false;/* sin carrusel: las piezas se ven como láminas, una por una *//* en Gráficas audiovisuales no se ven las tapas de la estación vecina */
     const near=cur>=0&&!!ST[cur]&&ST[cur].id==='editorial';if(near===last)return;last=near;mats.forEach(m=>{m.fog=!near;m.needsUpdate=true})})}
   /* carrusel de la campaña: 6 afiches en anillo */
   const cg=new THREE.Group();cg.visible=false;g.add(cg);cmpG0=cg;
@@ -1445,7 +1445,7 @@ window.SEN_ITEMS=['Cafetería','Baño','Accesibilidad','Informes','Información'
 station({id:'senaletica',az:D(100),R:27,y:.4,title:'Señalética',text:'El sistema de soportes: madera y acrílico con cada pictograma impreso.'+String.fromCharCode(92)+'nTocá uno para verlo en grande.',cam:{r:9.5,ph:.06}},g=>modelRing(g,'senaletica',window.SEN_ITEMS,{src:'assets/pictos/soporte.webp',aspect:1024/1536,trim:true,MH:5.6,sw:2.6,RX:5.6,cw:2.3,ry:-1.2}));
 
 /* CAMPAÑAS: los afiches de la campaña uno al lado del otro; al tocar uno se viene al frente, grande, y con las flechas se pasa de a uno */
-window.CMP_ITEMS=[1,2,3,4,5,6].map(n=>({n:'Campaña '+n,src:'assets/campana/c'+n+'.jpg'}));
+window.CMP_ITEMS=[1,2,4,3,5,6].map(n=>({n:'Campaña '+n,src:'assets/campana/c'+n+'.jpg'}));
 station({id:'campanas',az:D(165),R:27,y:.2,title:'Campañas',text:'Los afiches de la campaña Activemos el cambio. Tocá uno para traerlo al frente y pasá de a uno.',cam:{r:8.2,ph:.05}},g=>{
   const row=new THREE.Group();row.position.y=.2;g.add(row);const cards=RINGS['campanas']=[];const CW=720,CH=1020,PW=2.2,N=CMP_ITEMS.length;
   CMP_ITEMS.forEach((it,i)=>{const cv=canvas(CW,CH),x=cv.getContext('2d'),mat=new THREE.MeshBasicMaterial({map:mkTex(cv),transparent:true,depthWrite:false,side:THREE.DoubleSide,toneMapped:false,fog:false}),m=new THREE.Mesh(new THREE.PlaneGeometry(PW,PW*CH/CW),mat);m.userData.rg='campanas';m.userData.mg=i;m.renderOrder=3;row.add(m);
@@ -2356,8 +2356,23 @@ addEventListener('scroll',()=>{if(DESC.mode!=='scroll')return;clearTimeout(snapT
   const u=clamp(scrollY/Math.max(1,document.documentElement.scrollHeight-innerHeight),0,1)*uMax;let b=0;SNAPS.forEach((p,i)=>{if(Math.abs(p-u)<Math.abs(SNAPS[b]-u))b=i});if(snapI<SCR_N-1&&b>snapI)b=snapI;if(Math.abs(scrollY-posOf(SNAPS[b]))>2)snapTo(b);else snapI=b},160)},{passive:true});
 addEventListener('keydown',e=>{if(DESC.mode!=='scroll')return;const nx=['ArrowDown','PageDown','ArrowRight',' '],pv=['ArrowUp','PageUp','ArrowLeft'];
   if(nx.includes(e.key)){e.preventDefault();if(!mapGate(1))snapTo(snapI+1)}else if(pv.includes(e.key)){e.preventDefault();if(!mapGate(-1))snapTo(snapI-1)}});
+/* ---------- DISEÑO EDITORIAL: sin carrusel; al llegar aparece la primera lámina en grande y con Siguiente / ← / scroll se pasa de a una (los videos están dentro de su lámina) ---------- */
+{edHits.length=0;/* ya no se tocan las piezas del anillo */
+  const EDS=[{f:'e01',v:{src:'media/triptico.mp4',r:[430,171,1568,973]}},{f:'e02'},{f:'e03'},{f:'e04',v:{src:'media/revista.mp4',r:[226,62,1800,690]}},{f:'e05',v:{src:'media/diptico.webm',r:[430,171,1568,973]}},{f:'e06'},{f:'e07'},{f:'e08'},{f:'e09'},{f:'e10',v:{src:'assets/complejo/mapa-plegado.mp4',r:[430,171,1568,973]}},{f:'e11'}];
+  const css=document.createElement('style');css.textContent='#edsl{position:fixed;left:0;right:0;top:13vh;bottom:2vh;z-index:9;pointer-events:none;opacity:0;transition:opacity .6s;display:flex;align-items:center;justify-content:center}#edsl.on{opacity:1}#edsl .w{position:relative;width:min(100vw,calc((100vh - 15vh)*2000/1107));aspect-ratio:2000/1107}#edsl .s{position:absolute;inset:0;opacity:0;transition:opacity .55s}#edsl .s.a{opacity:1}#edsl img{position:absolute;inset:0;width:100%;height:100%;display:block}#edsl video{position:absolute;object-fit:cover;background:#d9d9d9}';document.head.appendChild(css);
+  const root=document.createElement('div');root.id='edsl';const wr=document.createElement('div');wr.className='w';root.appendChild(wr);document.body.appendChild(root);
+  const vids=[];EDS.forEach((o,i)=>{const d=document.createElement('div');d.className='s';const im=new Image();im.src='assets/editorial/'+o.f+'.webp';im.alt='';d.appendChild(im);
+    if(o.v){const v=document.createElement('video');v.muted=true;v.loop=true;v.playsInline=true;v.setAttribute('playsinline','');v.preload='none';v.setAttribute('muted','');const r=o.v.r;v.style.cssText='left:'+(r[0]/20)+'%;top:'+(r[1]/11.07)+'%;width:'+((r[2]-r[0])/20)+'%;height:'+((r[3]-r[1])/11.07)+'%';v.dataset.src=o.v.src;d.appendChild(v);vids[i]=v}
+    wr.appendChild(d)});
+  const sl=wr.querySelectorAll('.s');let edSl=0,wasHere=false,prevCur=-1;window.__edSl=()=>edSl;
+  window.__edGate=dir=>{if(DESC.mode!=='scroll'||cur<0||!ST[cur]||ST[cur].id!=='editorial')return false;if(dir>0&&edSl<EDS.length-1){edSl++;return true}if(dir<0&&edSl>0){edSl--;return true}return false};
+  ticks.push(()=>{const here=DESC.mode==='scroll'&&cur>=0&&!!ST[cur]&&ST[cur].id==='editorial';
+    if(here&&!wasHere){/* al llegar de la estación de adelante, se empieza por la última lámina; si no, por la primera */const pi=prevCur>=0&&ST[prevCur]?ST.indexOf(ST[prevCur]):-1;edSl=(pi>cur)?EDS.length-1:0}
+    wasHere=here;if(cur!==prevCur&&cur>=0)prevCur=cur;
+    root.classList.toggle('on',here);
+    sl.forEach((d,i)=>{d.classList.toggle('a',i===edSl&&here);const v=vids[i];if(v){if(i===edSl&&here){if(!v.src)v.src=v.dataset.src;if(v.paused)v.play().catch(()=>{})}else if(!v.paused)v.pause()}})})}
 /* ---------- mapa de dos caras en el modo scroll: Siguiente / ← giran la placa; con la cara final, pasan de estación ---------- */
-function mapGate(dir){if(DESC.mode!=='scroll'||cur<0||!ST[cur]||ST[cur].id!=='espacios'||!mapReady||!MF.go)return false;
+function mapGate(dir){if(window.__edGate&&window.__edGate(dir))return true;if(DESC.mode!=='scroll'||cur<0||!ST[cur]||ST[cur].id!=='espacios'||!mapReady||!MF.go)return false;
   if(MF.busy)return true;if(dir>0&&MF.face===0){MF.go(1);return true}if(dir<0&&MF.face===1){MF.go(0);return true}return false}
 {const css=document.createElement('style');css.textContent='#mnav{position:fixed;right:32px;bottom:40px;z-index:11;display:flex;gap:10px;opacity:0;pointer-events:none;transition:opacity .5s}#mnav.on{opacity:1;pointer-events:auto}#mnav .pill:disabled{opacity:.35;cursor:default;box-shadow:none}@media (max-width:700px){#mnav{right:16px;bottom:56px}}body.open #mnav{opacity:0!important;pointer-events:none!important}';document.head.appendChild(css);
   const nv=document.createElement('div');nv.id='mnav';nv.innerHTML='<button class="pill ghost" id="mprev" aria-label="Anterior">←</button><button class="pill" id="mnext">Siguiente →</button>';document.body.appendChild(nv);
