@@ -774,7 +774,7 @@ function endOff(){endScr=false;finEl.classList.remove('on')}
 /* después de Gracias: video de la publicidad de Bioferia en pantalla completa (se enciende y se apaga como la tele del inicio); al terminar, el centro con las luces y 'Activemos el cambio' */
 let finalVid=false;
 /* música de fondo, suave: arranca cuando termina el video de Capitán Planeta, sigue en loop por las estaciones y se apaga sola en el juego (y no vuelve en el cierre) */
-const BGM=new Audio('media/musica-fondo.mp3');BGM.loop=true;BGM.preload='auto';BGM.volume=0;let bgmOn=false,bgmT=performance.now();const BGM_VOL=.112;
+const BGM=new Audio('media/musica-fondo.mp3');BGM.loop=true;BGM.preload='auto';BGM.volume=0;let bgmOn=false,bgmT=performance.now();const BGM_VOL=.09;
 window.__bgmStart=()=>{bgmOn=true};window.__bgm=BGM;
 ticks.push(()=>{const now=performance.now(),dt=Math.min(.1,(now-bgmT)/1000);bgmT=now;if(!bgmOn)return;const id=cur>=0&&ST[cur]?ST[cur].id:'';const want=!(id==='juego'||id==='cierre'||finalVid||endScr);const tg=want?BGM_VOL:0;BGM.volume=Math.max(0,Math.min(1,BGM.volume+(tg-BGM.volume)*(1-Math.exp(-dt*(want?.8:2.2)))));if(want&&BGM.paused)BGM.play().catch(()=>{});else if(!want&&!BGM.paused&&BGM.volume<.004)BGM.pause()});
 const fvEl=document.createElement('div'),fvv=document.createElement('video'),fvSkip=document.createElement('button');let fOff=false;
