@@ -7,7 +7,7 @@
    primero las prendas de staff y después las de la estación donde estás y las que siguen en el recorrido, de a pocas por vez. */
 (function(){
   const D=Object.getOwnPropertyDescriptor(HTMLImageElement.prototype,'src');if(!D||!D.set)return;
-  const ORDER=['seed','agencia','posteres','graficas','editorial','pictos','senaletica','espacios','staff','merch','marketing','web','app','juego','cierre'];
+  const ORDER=['seed','agencia','posteres','graficas','campanas','editorial','pictos','senaletica','espacios','staff','merch','marketing','web','app','juego','cierre'];
   const GRP=[[['assets/staff/'],'staff'],[['assets/merch/'],'merch'],[['assets/posters/'],'posteres'],[['assets/campana/','assets/diptico/','assets/triptico/','assets/complejo/','assets/revista/'],'editorial'],[['assets/pictos/'],'pictos'],[['assets/graficas/','assets/stands/','assets/telas/','assets/mapa3d/','assets/mapa/'],'espacios'],[['assets/instagram/'],'marketing'],[['media/web-home'],'web'],[['assets/app/'],'app'],[['assets/juego/'],'juego'],[['assets/centro/'],'seed'],[['logo-butbe'],'cierre']];
   const Q=[];let active=0,released=false;const MAXC=3;
   const grp=u=>{for(const [r,g] of GRP)if(r.some(k=>u.indexOf(k)>=0))return g;return null};
@@ -1045,10 +1045,10 @@ station({id:'graficas',az:D(157),R:27,y:.4,title:'Gráficas audiovisuales',text:
 /* 6 Editorial */
 const EDF=[{n:'CAMPAÑA',c:['#ff00b8','#ff4a8e','#fa3030'],grad:gradArt('A','d')},{n:'DÍPTICO',c:['#ff00b8','#ff4a8e','#fa3030'],grad:gradArt('A','rev')},{n:'EDITORIAL COMPLEJO',c:['#ff00b8','#ff4a8e','#fa3030'],grad:gradArt('A','u')},{n:'PÓSTER',c:['#ff00b8','#ff4a8e','#fa3030'],grad:gradArt('A','v')},{n:'REVISTA',c:['#ff00b8','#ff4a8e','#fa3030'],grad:gradArt('A','hr')},{n:'TRÍPTICO',c:['#ff00b8','#ff4a8e','#fa3030'],grad:gradArt('A','rad')}];
 const edG=[],cmpMeshes=[],cmpPs=[],edHits=[],dipIm=[],triIm=[],cxIm=[];let cxOpen=false,cxP=0,cxV=null,cxUp=null,triOpen=false,triP=0,triV=null,revOpen=false,revP=0,revCf=0,revCt=0,revDrag=false,revV=0,revV0=null,revMeshes=[],dipOpen=false,dipP=0,dipV=null,pstOpen=false,pstP=0,pstM=null,cmpOpen=false,cmpP=0,cmpCf=0,cmpCt=0,cmpDrag=false,cmpV=0,cmpG0=null;
-station({id:'editorial',az:D(172),R:27,y:-.8,title:'Diseño editorial',text:'Libros, folletos y cartillas en seis formatos: campaña, díptico, editorial complejo, póster, revista y tríptico.',cam:{r:15,ph:.1}},g=>{
+station({id:'editorial',az:D(172),R:27,y:-.8,title:'Diseño editorial',text:'Libros, folletos y cartillas en cinco formatos: díptico, editorial complejo, póster, revista y tríptico.',cam:{r:15,ph:.1}},g=>{
   const edRow=new THREE.Group();g.add(edRow);autoCenter(edRow,'editorial');
   /* las seis piezas (en lugar de las carpetas rosas): cada una flota con su tapa y su nombre; al tocarla se abre su interior */
-  const EDP=[{ed:0,n:'CAMPAÑAS',src:'assets/campana/n3.jpg'},{ed:1,n:'DÍPTICO',src:'assets/revista/01.jpg'},{ed:2,n:'EDITORIAL COMPLEJO',src:'assets/complejo/frame-71.jpg',crop:[0,0,.709,1]},
+  const EDP=[{ed:1,n:'DÍPTICO',src:'assets/revista/01.jpg'},{ed:2,n:'EDITORIAL COMPLEJO',src:'assets/complejo/frame-71.jpg',crop:[0,0,.709,1]},
     {ed:4,n:'FANZINE',src:'assets/revista/02.jpg'},{ed:3,n:'POSTER',src:'assets/campana/poster.webp'},{ed:5,n:'TRÍPTICO',src:'assets/triptico/exterior.jpg',crop:[.5,0,.5,1]}];
   EDP.forEach((r,i)=>{const g1=new THREE.Group(),mat=new THREE.MeshBasicMaterial({side:THREE.DoubleSide,toneMapped:false}),m=new THREE.Mesh(new THREE.PlaneGeometry(1,1.414),mat);m.userData.ed=r.ed;m.visible=false;
     const im=new Image();im.onload=()=>{const cr=r.crop||[0,0,1,1],sx=Math.round(im.width*cr[0]),sy=Math.round(im.height*cr[1]),sw=Math.round(im.width*cr[2]),sh=Math.round(im.height*cr[3]),k=Math.min(1,1100/Math.max(sw,sh)),c=canvas(Math.round(sw*k),Math.round(sh*k));c.getContext('2d').drawImage(im,sx,sy,sw,sh,0,0,c.width,c.height);
@@ -1056,7 +1056,7 @@ station({id:'editorial',az:D(172),R:27,y:-.8,title:'Diseño editorial',text:'Lib
     const nm=label(r.n,{size:72,weight:700,world:r.n.length>12?.075:.095,spacing:.02});nm.position.set(0,-.9,0);nm.userData.ed=r.ed;g1.add(m,nm);
     const col=i%3,row=Math.floor(i/3);g1.scale.setScalar(2.8);edRow.add(g1);edG.push(g1);edHits.push(m,nm);
     /* una sola fila, una pieza al lado de la otra (en pantallas verticales, dos filas para que se lean) */
-    ticks.push(t=>{const E=window.EDR=window.EDR||{a:0,l:0,v:0};if(i===0){const dt=Math.min(.1,Math.max(0,t-E.l));E.l=t;E.a+=dt*.5}const wide=camera.aspect>1.15,R=wide?4.1:2.6;let d=((i-E.a*6/(Math.PI*2))%6+9)%6-3;const ph=d*Math.PI*2/6,sel=Math.max(0,1-Math.abs(d)),ff=(Math.cos(ph)+1)/2,rr=R+1.3*sel,zz=Math.cos(ph)*rr;g1.position.set(Math.sin(ph)*rr,-.1-zz*.1+Math.sin(t*.6+i*1.3)*.03,zz*.92);g1.rotation.set(0,ph*.22,0);g1.userData.s=(wide?2.3:1.35)*(.82+.4*sel);m.scale.setScalar(1);nm.position.set(0,-1.05,0);const mt=m.material;if(mt){mt.color.setScalar(sel>0?1:.3+.6*Math.pow(ff,1.4))}if(nm.material){nm.material.transparent=true;nm.material.opacity=Math.max(.2,ff);nm.material.color.set('#ffffff')}})});
+    ticks.push(t=>{const E=window.EDR=window.EDR||{a:0,l:0,v:0};if(i===0){const dt=Math.min(.1,Math.max(0,t-E.l));E.l=t;E.a+=dt*.5}const wide=camera.aspect>1.15,R=wide?4.1:2.6;const NE=EDP.length;let d=((i-E.a*NE/(Math.PI*2))%NE+NE*1.5)%NE-NE/2;const ph=d*Math.PI*2/NE,sel=Math.max(0,1-Math.abs(d)),ff=(Math.cos(ph)+1)/2,rr=R+1.3*sel,zz=Math.cos(ph)*rr;g1.position.set(Math.sin(ph)*rr,-.1-zz*.1+Math.sin(t*.6+i*1.3)*.03,zz*.92);g1.rotation.set(0,ph*.22,0);g1.userData.s=(wide?2.3:1.35)*(.82+.4*sel);m.scale.setScalar(1);nm.position.set(0,-1.05,0);const mt=m.material;if(mt){mt.color.setScalar(sel>0?1:.3+.6*Math.pow(ff,1.4))}if(nm.material){nm.material.transparent=true;nm.material.opacity=Math.max(.2,ff);nm.material.color.set('#ffffff')}})});
   /* colores plenos: sin niebla sobre las piezas (la niebla clara las desteñía) */
   {let mats=null,last=null;ticks.push(()=>{if(!mats){mats=[];g.traverse(o=>{[].concat(o.material||[]).forEach(m=>{if(m&&m.fog!==undefined&&mats.indexOf(m)<0)mats.push(m)})})}
     edRow.visible=!(cur>=0&&!!ST[cur]&&ST[cur].id==='graficas');/* en Gráficas audiovisuales no se ven las tapas de la estación vecina */
@@ -1444,6 +1444,18 @@ function sopCard(k){if(sopCache[k])return sopCache[k];if(!SOP.post||!SOP.pics[k]
 window.SEN_ITEMS=['Cafetería','Baño','Accesibilidad','Informes','Información','Plaza central','Gift shop','Mapa','Colgante','Muro'].map((n,k)=>({n,src:'assets/senaletica/s'+(k+1)+'.webp'}));/* las cards: los soportes en el predio (se abren grandes con flechas) */
 station({id:'senaletica',az:D(100),R:27,y:.4,title:'Señalética',text:'El sistema de soportes: madera y acrílico con cada pictograma impreso.'+String.fromCharCode(92)+'nTocá uno para verlo en grande.',cam:{r:9.5,ph:.06}},g=>modelRing(g,'senaletica',window.SEN_ITEMS,{src:'assets/pictos/soporte.webp',aspect:1024/1536,trim:true,MH:5.6,sw:2.6,RX:5.6,cw:2.3,ry:-1.2}));
 
+/* CAMPAÑAS: los afiches de la campaña uno al lado del otro; al tocar uno se viene al frente, grande, y con las flechas se pasa de a uno */
+window.CMP_ITEMS=[1,2,3,4,5,6].map(n=>({n:'Campaña '+n,src:'assets/campana/c'+n+'.jpg'}));
+station({id:'campanas',az:D(165),R:27,y:.2,title:'Campañas',text:'Los afiches de la campaña Activemos el cambio. Tocá uno para traerlo al frente y pasá de a uno.',cam:{r:8.2,ph:.05}},g=>{
+  const row=new THREE.Group();row.position.y=.2;g.add(row);const cards=RINGS['campanas']=[];const CW=720,CH=1020,PW=2.05,N=CMP_ITEMS.length;
+  CMP_ITEMS.forEach((it,i)=>{const cv=canvas(CW,CH),x=cv.getContext('2d'),mat=new THREE.MeshBasicMaterial({map:mkTex(cv),transparent:true,depthWrite:false,side:THREE.DoubleSide,toneMapped:false,fog:false}),m=new THREE.Mesh(new THREE.PlaneGeometry(PW,PW*CH/CW),mat);m.userData.rg='campanas';m.userData.mg=i;m.renderOrder=3;row.add(m);
+    const im=new Image();im.onload=()=>{const pad=34,r=46;x.clearRect(0,0,CW,CH);x.save();x.shadowColor='rgba(20,20,30,.4)';x.shadowBlur=34;x.shadowOffsetY=14;x.fillStyle='#f7f6f2';x.beginPath();x.moveTo(pad+r,pad);x.arcTo(CW-pad,pad,CW-pad,CH-pad,r);x.arcTo(CW-pad,CH-pad,pad,CH-pad,r);x.arcTo(pad,CH-pad,pad,pad,r);x.arcTo(pad,pad,CW-pad,pad,r);x.closePath();x.fill();x.restore();
+      const iw=CW-pad*2-58,ih=iw*im.height/im.width,ix=(CW-iw)/2,iy=(CH-ih)/2;x.save();x.shadowColor='rgba(20,20,30,.55)';x.shadowBlur=24;x.shadowOffsetY=9;x.drawImage(im,ix,iy,iw,ih);x.restore();mat.map.needsUpdate=true};im.src=it.src;
+    cards.push({m,i,mat})});
+  let lt=0;ticks.push(t=>{const wide=camera.aspect>1.15,SP=PW*1.0;cards.forEach(o=>{const i=o.i,here=cur>=0&&ST[cur]&&ST[cur].id==='campanas';let px,py;if(wide){px=(i-(N-1)/2)*SP;py=0}else{const c=i%3,rw=Math.floor(i/3);px=(c-1)*SP;py=(.5-rw)*PW*1.5}
+      o.m.position.set(px,py+Math.sin(t*.7+i*1.3)*.05,-Math.abs(px)*.05);o.m.rotation.y=-px*.035;o.m.rotation.z=Math.sin(t*.5+i)*.012})});
+  const gl=glow('#ff3aa8',10,.04);gl.position.set(0,-1.8,-.8);g.add(gl)});
+
 /* 12 Indumentaria de staff */
 const STF=[{n:'REMERA',c:['#FA3710','#ffb347','#ff0099','#7a1fa2']},{n:'BUZO',c:['#005BFC','#25f4ee','#7c4dff','#101040']},{n:'CAMPERA',c:['#FED108','#ff7a1a','#d62976','#4f5bd5']},{n:'GORRA',c:['#01DAC7','#9ad66a','#FED108','#1a8a6a']},{n:'CREDENCIAL',c:['#FF0099','#ff6aa8','#ffc4dd','#6a00a8']},{n:'DELANTAL',c:['#FA3710','#ff9a4d','#005BFC','#101040']}];
 /* Remera 3D: a partir del mockup (frente y espalda sobre blanco) quita el fondo, separa las dos vistas
@@ -1614,7 +1626,7 @@ ST.push({id:'all',title:'Vista general',text:'El universo completo. Desde acá p
 ST.unshift({id:'seed',title:'Concepto e identidad',text:'Una semilla que contiene cuatro elementos —hacer, conectar, transformar y cuidar— y un quinto, el corazón, que los mezcla y los celebra. De acá nace todo el sistema.',az:0,R:0,y:0,pos:new V3(0,0,0),cam:{r:9.4,ph:.06,dy:.85}});
 /* ORDEN DE LA PRESENTACIÓN (el que se recorre con Siguiente), en tres actos: sistema gráfico (pósters, editoriales, pictogramas) → espacio y presencia (mapa, indumentaria, merch) → digital y participación (redes, web, app, juego) → manifiesto final.
    Las estaciones que no están en la lista (vista general) quedan fuera del recorrido pero siguen en el código: para sumarlas, agregá su id a ORDER. */
-const ORDER=['seed','agencia','posteres','graficas','editorial','pictos','senaletica','espacios','staff','merch','marketing','web','app','juego','cierre'];
+const ORDER=['seed','agencia','posteres','graficas','campanas','editorial','pictos','senaletica','espacios','staff','merch','marketing','web','app','juego','cierre'];
 {const by={};ST.forEach(s=>by[s.id]=s);ST.length=0;ORDER.forEach(id=>{if(by[id])ST.push(by[id])});
   /* las estaciones del anillo se reparten parejo, en el orden del recorrido (el centro y el cierre no ocupan lugar en el anillo) */
   const ring=ORDER.filter(id=>id!=='seed'&&id!=='cierre'&&by[id]);/* EL DESCENSO: las estaciones bajan en espiral en zigzag; cada una mira hacia el eje (la cámara baja y, de a ratos, gira hacia la del costado) */
@@ -2068,7 +2080,7 @@ function galOpen(n,get,k0,mesh,onK){const src=get(k0);if(!src)return;GAL={n,get,
     pzb.style.transition='none';pzb.style.transform='none';const r=pzb.getBoundingClientRect(),sc=Math.max(.12,Math.min(.9,(y1-y0)/r.height));
     pzb.style.transform='translate('+((x0+x1)/2-(r.left+r.width/2))+'px,'+((y0+y1)/2-(r.top+r.height/2))+'px) scale('+sc+')';void pzb.offsetWidth;pzb.style.transition=''}
   pzb.style.transform='none';pz.classList.add('on')}
-const RING_ITEMS=()=>({merch:MERCH_ITEMS,staff:STAFF_ITEMS,senaletica:window.SEN_ITEMS||[]});
+const RING_ITEMS=()=>({merch:MERCH_ITEMS,staff:STAFF_ITEMS,senaletica:window.SEN_ITEMS||[],campanas:window.CMP_ITEMS||[]});
 function openMg(i,id){id=id||(cur>=0&&ST[cur]&&ST[cur].id);const L=RING_ITEMS()[id],h=RINGS[id]&&RINGS[id][i];if(!L||!h)return;galOpen(L.length,k=>typeof L[k].src==='function'?L[k].src():L[k].src,i,h.m)}
 window.__mg=openMg;
 let mgDn=null;cv.addEventListener('pointerdown',e=>{mgDn={x:e.clientX,y:e.clientY}});
