@@ -783,7 +783,7 @@ fvv.id='fvv';fvv.playsInline=true;fvv.setAttribute('playsinline','');fvv.preload
 fvSkip.className='pill ghost';fvSkip.textContent='Saltar →';fvSkip.style.cssText='position:absolute;right:26px;bottom:26px;z-index:2';fvEl.append(fvv,fvSkip);document.body.appendChild(fvEl);
 let fsDone=null,stdStage=0,fsIsFinal=false;
 function playFinalVideo(){playFS('media/bioferia-final.mp4',null)}
-function playFS(src,done){fsDone=done;fsIsFinal=src.indexOf('bioferia-final')>=0;finalVid=true;fOff=false;if(window.__cierreStop)window.__cierreStop();document.querySelectorAll('audio,video').forEach(m=>{if(m!==fvv&&!m.paused&&!m.muted&&m.volume>0)m.pause()});fvv.classList.remove('crt1','crt2');fvv.style.display='block';fvEl.style.display='block';requestAnimationFrame(()=>requestAnimationFrame(()=>{fvEl.style.opacity=1}));if(fvv.getAttribute('src')!==src)fvv.src=src;fsWatch();fvv.currentTime=0;fvv.muted=false;fvv.volume=1;fvv.play().catch(()=>{fvv.muted=true;fvv.play().catch(finalOff)})}
+function playFS(src,done){fsDone=done;fsIsFinal=src.indexOf('bioferia-final')>=0;finalVid=true;fOff=false;if(window.__cierreStop)window.__cierreStop();document.querySelectorAll('audio,video').forEach(m=>{if(m!==fvv&&!m.paused)m.pause()});if(fsIsFinal&&window.__bgm)window.__bgm.pause();fvv.classList.remove('crt1','crt2');fvv.style.display='block';fvEl.style.display='block';requestAnimationFrame(()=>requestAnimationFrame(()=>{fvEl.style.opacity=1}));if(fvv.getAttribute('src')!==src)fvv.src=src;fsWatch();fvv.currentTime=0;fvv.muted=false;fvv.volume=1;fvv.play().catch(()=>{fvv.muted=true;fvv.play().catch(finalOff)})}
 /* red de seguridad del video a pantalla completa: si no arranca (carga lenta o el navegador bloquea la reproducción) se reintenta sin sonido y, si sigue trabado, se cierra y vuelve; un toque sobre el video lo reanuda */
 function fsWatch(){const t0=performance.now();let tries=0;const iv=setInterval(()=>{if(!finalVid||fOff){clearInterval(iv);return}if(fvv.currentTime>.2&&!fvv.paused){clearInterval(iv);return}const el=(performance.now()-t0)/1000;if(el>4&&tries===0){tries=1;fvv.muted=true;fvv.play().catch(()=>{})}if(el>10){clearInterval(iv);finalOff()}},500)}
 fvEl.addEventListener('click',e=>{if(e.target===fvSkip)return;if(finalVid&&fvv.paused&&!fOff){fvv.play().catch(()=>{})}});
@@ -1852,6 +1852,7 @@ addEventListener('resize',resize);resize();
    ============================================================ */
 const clock=new THREE.Clock();
 function frame(){
+  if(finalVid&&!fOff){clock.getDelta();requestAnimationFrame(frame);return}/* con un video a pantalla completa no se dibuja la escena de atrás (así el video no se traba) */
   const dt=Math.min(clock.getDelta(),.05);tNow+=dt;if(started&&seedOn)introT+=dt;
   /* intro de la semilla */
   undoDim();seedDim+=((cur===seedIdx||(ST[cur]&&ST[cur].id==='all')?((cur===seedIdx&&elStep===2)?.22:1):(ST[cur]&&(ST[cur].id==='editorial'||ST[cur].id==='marketing'||ST[cur].id==='merch'||ST[cur].id==='staff'||ST[cur].id==='senaletica')?0:.14))-seedDim)*(1-Math.exp(-dt*2.2));const sd=Math.max(.01,seedDim);const it=introT;const a=eo(it/2.4);shellMat.uniforms.uA.value=started?a*sd:0;shellMat.uniforms.uT.value=tNow;
@@ -1924,7 +1925,7 @@ function openInfo(src,vid){const tok=++openTok,go=()=>{if(tok!==openTok)return;m
   if(vid&&vid.readyState<3){need++;vid.addEventListener('canplay',hit,{once:true});vid.addEventListener('error',hit,{once:true})}
   if(!need)return go();setTimeout(go,2500)}
 /* precarga de los videos del mapa: de a uno, cuando te acercás a la estación (así la tarjeta abre al instante) */
-const VIDS_ALL=[...new Set(Object.values(VID).concat('stand-fuego'))];let vidWarm=false;
+const VIDS_ALL=[...new Set(Object.values(VID).concat('stand-fuego'))];let vidWarm=true;/* sin precarga: los videos del mapa se sacaron (queda solo el video de los stands a pantalla completa) */
 function warmVideos(){if(vidWarm)return;vidWarm=true;const box=document.createElement('div');box.style.cssText='position:fixed;left:-9999px;top:0;width:2px;height:2px;opacity:0;pointer-events:none;overflow:hidden';document.body.appendChild(box);let k=0;
   const next=()=>{if(k>=VIDS_ALL.length)return;const v=document.createElement('video');v.muted=true;v.preload='auto';v.playsInline=true;v.src='assets/video-mapa/'+VIDS_ALL[k++]+'.mp4';let done=false;const fin=()=>{if(done)return;done=true;setTimeout(next,120)};v.addEventListener('canplaythrough',fin,{once:true});v.addEventListener('error',fin,{once:true});setTimeout(fin,9000);box.appendChild(v)};next()}
 ticks.push(()=>{if(vidWarm||!mapReady||cur<0||!ST[cur])return;const ei=ST.findIndex(x=>x.id==='espacios');if(ei>=0&&cur>=ei-3)warmVideos()});
@@ -1932,22 +1933,22 @@ ticks.push(()=>{if(vidWarm||!mapReady||cur<0||!ST[cur])return;const ei=ST.findIn
 const MF={face:0,busy:false,flipping:false,go:null};window.__mapFlip=to=>MF.go&&MF.go(to);window.__MF=MF;
 {const st=document.createElement('style');st.textContent='.m3__foto[hidden]{display:none!important}#minfo video.m3__foto{background:#000}#tbtn,#tx,#thint,#tjoy{display:none!important}';document.head.appendChild(st)}
 function standGallery(d){let i=STAND_START[d.p.id]||0;
-  minfo.innerHTML='<button type="button" class="m3__x2" aria-label="Cerrar">×</button><div class="stg"><img class="m3__foto" draggable="false" alt="Stand">'+vidTag('stand-fuego','assets/stands/fuego.webp','hidden')+'<button type="button" class="stg__b stg__p" aria-label="Anterior">‹</button><button type="button" class="stg__b stg__n" aria-label="Siguiente">›</button></div>'+
+  minfo.innerHTML='<button type="button" class="m3__x2" aria-label="Cerrar">×</button><div class="stg"><img class="m3__foto" draggable="false" alt="Stand">'+'<button type="button" class="stg__b stg__p" aria-label="Anterior">‹</button><button type="button" class="stg__b stg__n" aria-label="Siguiente">›</button></div>'+
     '<p class="m3__tag"></p><h3>Expositores</h3><div class="stg__dots"></div><p class="m3__nota">Un stand por elemento: cada uno con su color, su gráfica y su material.</p><button type="button" class="m3__vuelta">Cerrar</button>';
   const img=minfo.querySelector('img'),vid=minfo.querySelector('video'),tag=minfo.querySelector('.m3__tag'),dots=minfo.querySelector('.stg__dots');
   STANDS.forEach((st,j)=>{const b=document.createElement('i');b.style.setProperty('--c',st.c);b.onclick=()=>show(j);dots.appendChild(b)});
-  function show(j){i=(j+STANDS.length)%STANDS.length;const st=STANDS[i],isV=st.k==='fuego';img.src='assets/stands/'+st.k+'.webp';img.hidden=isV;vid.hidden=!isV;if(isV){vid.currentTime=0;vid.play().catch(()=>{})}else vid.pause();tag.textContent=st.n;minfo.style.setProperty('--c',st.c);[...dots.children].forEach((b,k)=>b.classList.toggle('a',k===i))}
+  function show(j){i=(j+STANDS.length)%STANDS.length;const st=STANDS[i];img.src='assets/stands/'+st.k+'.webp';img.hidden=false;tag.textContent=st.n;minfo.style.setProperty('--c',st.c);[...dots.children].forEach((b,k)=>b.classList.toggle('a',k===i))}
   minfo.querySelector('.stg__p').onclick=()=>show(i-1);minfo.querySelector('.stg__n').onclick=()=>show(i+1);
   minfo.querySelector('.m3__x2').onclick=minfo.querySelector('.m3__vuelta').onclick=closeInfo;
-  minfo.hidden=true;show(i);openInfo(img.src,STANDS[i].k==='fuego'?vid:null)}
-function selectPin(d){if(/^stands/.test(d.p.id))return standGallery(d);const p=Object.assign({},d.p,PIN_NAME[d.p.id]?{n:PIN_NAME[d.p.id]}:{}),C=window.BIOFERIA,cats=((C&&C.areas&&C.areas.categorias)||[]).map((c,i)=>({n:c.n,i:i+1,l:c.lugar})).filter(c=>(p.lugar&&c.l===p.lugar)||(p.cat&&c.n===p.cat));
+  minfo.hidden=true;show(i);openInfo(img.src,null)}
+function selectPin(d){return;/* sin ventanas emergentes en el mapa: ni fotos ni videos; solo el video de stands a pantalla completa */const p=Object.assign({},d.p,PIN_NAME[d.p.id]?{n:PIN_NAME[d.p.id]}:{}),C=window.BIOFERIA,cats=((C&&C.areas&&C.areas.categorias)||[]).map((c,i)=>({n:c.n,i:i+1,l:c.lugar})).filter(c=>(p.lugar&&c.l===p.lugar)||(p.cat&&c.n===p.cat));
   const esc=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   minfo.style.setProperty('--c',(pinColors()[p.id])||M3.CSS[p.c]);/* el soporte del texto toma el color de la luz del sector */
-  minfo.innerHTML='<button type="button" class="m3__x2" aria-label="Cerrar">×</button>'+(MFOTO[p.id]?(VID[p.id]?vidTag(VID[p.id],MPH(p.id)):'<img class="m3__foto" src="'+MPH(p.id)+'" alt="'+esc(p.n)+'" draggable="false">'):'')+
+  minfo.innerHTML='<button type="button" class="m3__x2" aria-label="Cerrar">×</button>'+(MFOTO[p.id]?(false?'':'<img class="m3__foto" src="'+MPH(p.id)+'" alt="'+esc(p.n)+'" draggable="false">'):'')+
     '<p class="m3__tag">'+esc(MVERBO[p.c])+'</p><h3>'+esc(p.n)+'</h3>'+(cats.length?'<p class="m3__lbl">Categorías que viven acá</p><ul>'+cats.map(c=>'<li><b>'+String(c.i).padStart(2,'0')+'</b>'+esc(c.n)+'</li>').join('')+'</ul>':'<p class="m3__nota">'+esc(p.nota||'')+'</p>')+
     '<button type="button" class="m3__vuelta">Cerrar</button>';
   minfo.querySelector('.m3__x2').onclick=minfo.querySelector('.m3__vuelta').onclick=closeInfo;
-  minfo.hidden=true;openInfo(MFOTO[p.id]?MPH(p.id):null,VID[p.id]?minfo.querySelector('video'):null)}
+  minfo.hidden=true;openInfo(MFOTO[p.id]?MPH(p.id):null,null)}
 const pinGroup=new THREE.Group(),pinHits=[],pinGroupB=new THREE.Group(),pinHitsB=[];
 const beamTex=(()=>{const c=canvas(8,128),x=c.getContext('2d'),g=x.createLinearGradient(0,128,0,0);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.55,'rgba(255,255,255,.35)');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,8,128);return new THREE.CanvasTexture(c)})();
 function pillLabel(text,world){const c=canvas(8,8),x=c.getContext('2d'),f='400 44px Inter,sans-serif';x.font=f;const w=Math.ceil(x.measureText(text).width+48),h=76;c.width=w;c.height=h;
