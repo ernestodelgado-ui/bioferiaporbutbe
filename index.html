@@ -357,7 +357,7 @@ const MATERIAL = {
   editorial: [null,null,null,null,null,null,null],  // 0 portada, 1-2 doble página, 3-6 folleto
   marketing: [null,null,null,null],
   web:       ['media/web-home.webp'],                       // 0: captura de la web
-  app:       ['assets/app/home.png','assets/app/mapa.png','assets/app/mural.png'],  // capturas de la app
+  app:       ['assets/app/home.png','assets/app/mapa.png','assets/app/desafio.png'],  // capturas de la app
   merch:     [null,null,null,null,null],   // 0-4: fotos de producto (remera, tote, botella, stickers, gorra)
   juego:     [null,null],                  // 0: texto, 1: nivel
   cierre:    [null]                        // 0: video o imagen de cierre (null = anillos de los elementos + frase final)
@@ -1281,7 +1281,7 @@ const APPURL='https://bioapp-lilac.vercel.app/';let appG=null,juegoG=null,flyIdx
 const APPSCR=[
   {t:'PANTALLA PRINCIPAL',c:'#FF0099',img:'assets/app/home.png',h:'Todo Bioferia en una pantalla',l:['Mirá qué está pasando ahora en la feria','Armá tu recorrido y guardá tus actividades','Tené a mano tu entrada y el mapa','Explorá Fuego, Aire, Agua, Tierra y Corazón']},
   {t:'ENCONTRÁ TU LUGAR',c:'#FED108',img:'assets/app/mapa.png',h:'El mapa del Hipódromo',l:['Buscá un expositor, una actividad o un sector','Escenarios, stands, descanso, baños e informes','Acercá, alejá y ubicate con un toque']},
-  {t:'SUMATE AL MURAL',c:'#01DAC7',img:'assets/app/mural.png',h:'Lo que más te gustó',l:['Subí una foto de lo que más disfrutaste','Mirá el gran cuadro de Bioferia, espacio por espacio','Dale corazón a tus favoritas']}];
+  {t:'7 DÍAS PARA ACTIVAR EL CAMBIO',c:'#01DAC7',img:'assets/app/desafio.png',h:'Elegí un desafío y activá tu recompensa',l:['Elegí un desafío','Hacelo durante siete días y marcá cada día lo que hiciste','Activá tu recompensa: al completar los 7 días se desbloquean descuentos','Mirá en el mapa de beneficios dónde canjearla']}];
 function rrShape(w,h,r){const s=new THREE.Shape(),x=-w/2,y=-h/2,P=Math.PI;s.moveTo(x+r,y);s.lineTo(x+w-r,y);s.absarc(x+w-r,y+r,r,-P/2,0,false);s.lineTo(x+w,y+h-r);s.absarc(x+w-r,y+h-r,r,0,P/2,false);s.lineTo(x+r,y+h);s.absarc(x+r,y+h-r,r,P/2,P,false);s.lineTo(x,y+r);s.absarc(x+r,y+r,r,P,P*1.5,false);return s}
 function flatShape(w,h,r,mat,z){const g=new THREE.ShapeGeometry(rrShape(w,h,r),14),p=g.attributes.position,uv=g.attributes.uv;for(let k=0;k<p.count;k++)uv.setXY(k,p.getX(k)/w+.5,p.getY(k)/h+.5);const m=new THREE.Mesh(g,mat);m.position.z=z;return m}
 const pv=document.getElementById('pv'),pvs=pv.querySelector('.pv__scr'),pvp=pv.querySelector('.pv__ph');let pvI=-1,pvTm=0;
