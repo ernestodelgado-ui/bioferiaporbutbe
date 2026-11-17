@@ -775,9 +775,9 @@ function endOff(){endScr=false;finEl.classList.remove('on');const fb=finEl.query
 /* después de Gracias: video de la publicidad de Bioferia en pantalla completa (se enciende y se apaga como la tele del inicio); al terminar, el centro con las luces y 'Activemos el cambio' */
 let finalVid=false;
 /* música de fondo, suave: arranca cuando termina el video de Capitán Planeta, sigue en loop por las estaciones y se apaga sola en el juego (y no vuelve en el cierre) */
-const BGM=new Audio('media/musica-fondo.mp3');BGM.loop=true;BGM.preload='auto';BGM.volume=0;let bgmOn=false,bgmT=performance.now();const BGM_VOL=.072;
+const BGM=new Audio('media/musica-fondo.mp3');BGM.loop=true;BGM.preload='auto';BGM.volume=0;let bgmOn=false,bgmN=0,bgmDuck=false,bgmT=performance.now();const BGM_VOL=.0576;
 window.__bgmStart=()=>{bgmOn=true};window.__bgm=BGM;
-ticks.push(()=>{const now=performance.now(),dt=Math.min(.1,(now-bgmT)/1000);bgmT=now;if(!bgmOn)return;const id=cur>=0&&ST[cur]?ST[cur].id:'';const want=!(id==='juego'||id==='cierre'||(finalVid&&fsIsFinal));/* la música se apaga desde el juego y vuelve en el final (Activemos el cambio) */const tg=want?BGM_VOL:0;BGM.volume=Math.max(0,Math.min(1,BGM.volume+(tg-BGM.volume)*(1-Math.exp(-dt*(want?.8:2.2)))));if(want&&BGM.paused)BGM.play().catch(()=>{});else if(!want&&!BGM.paused&&BGM.volume<.004)BGM.pause()});
+ticks.push(()=>{const now=performance.now(),dt=Math.min(.1,(now-bgmT)/1000);bgmT=now;if(!bgmOn)return;const id=cur>=0&&ST[cur]?ST[cur].id:'';bgmN=(bgmN+1)%10;if(!bgmN)bgmDuck=[...document.querySelectorAll('video,audio')].some(m=>m!==fvv&&m!==fvv2&&!m.paused&&!m.muted&&m.volume>0&&m.readyState>1);/* si hay un video con sonido a la vista (por ejemplo el concepto), la música de fondo se baja a cero */const want=!(id==='juego'||id==='cierre'||bgmDuck||(finalVid&&fsIsFinal));/* la música se apaga desde el juego y vuelve en el final (Activemos el cambio) */const tg=want?BGM_VOL:0;BGM.volume=Math.max(0,Math.min(1,BGM.volume+(tg-BGM.volume)*(1-Math.exp(-dt*(want?.8:2.2)))));if(want&&BGM.paused)BGM.play().catch(()=>{});else if(!want&&!BGM.paused&&BGM.volume<.004)BGM.pause()});
 const fvEl=document.createElement('div'),fvv=document.createElement('video'),fvSkip=document.createElement('button');let fOff=false;
 fvEl.id='fvid';fvEl.style.cssText='position:fixed;inset:0;z-index:61;background:#000;display:none;opacity:0;transition:opacity .6s';
 fvv.id='fvv';fvv.playsInline=true;fvv.setAttribute('playsinline','');fvv.preload='auto';fvv.style.cssText='position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000';
@@ -1625,18 +1625,18 @@ station({id:'cierre',az:0,R:0,y:26,title:'Cierre',text:'Gracias por recorrer el 
       if(p<1){const gx=sx0+(ex/SW)*sw,gy=sy0+sh*.62,rg=x.createRadialGradient(gx,gy,0,gx,gy,34);rg.addColorStop(0,'rgba(255,110,110,.95)');rg.addColorStop(1,'rgba(255,45,61,0)');x.fillStyle=rg;x.fillRect(gx-34,gy-34,68,68)}}
     x.globalAlpha=1};
   /* arranque, repetición y salto con un toque */
-  let state='idle',t0=0,offAt=0,off=0,skip=false,lastKey='',aud=null,vidAuto=false;window.__cierreStop=()=>{if(aud)aud.pause()};const AUD_END=80,AUD_FADE=4;/* el audio suena desde que empieza el manifiesto hasta 1:20, con fade al final */
-  const reset=()=>{x.clearRect(0,0,W,H);tex.needsUpdate=true;lastKey='';off=0;skip=false;vidAuto=false};
+  let state='idle',t0=0,offAt=0,off=0,skip=false,lastKey='',aud=null,endT=-1;window.__cierreStop=()=>{if(aud)aud.pause()};const AUD_END=80,AUD_FADE=4;/* el audio suena desde que empieza el manifiesto hasta 1:20, con fade al final */
+  const reset=()=>{x.clearRect(0,0,W,H);tex.needsUpdate=true;lastKey='';off=0;skip=false;endT=-1};
   cv.addEventListener('pointerup',e=>{if(state==='run'&&cur>=0&&ST[cur].id==='cierre'&&dnC&&Math.hypot(e.clientX-dnC.x,e.clientY-dnC.y)<6)skip=true});let dnC=null;cv.addEventListener('pointerdown',e=>{dnC={x:e.clientX,y:e.clientY}});
   ticks.push(t=>{document.body.classList.toggle('cierre',cur>=0&&ST[cur].id==='cierre');/* en el cierre se ve solo el texto: sin título ni contador */
     const on=cur>=0&&ST[cur].id==='cierre'&&(state!=='idle'||camera.position.distanceTo(g.position)<15);
     if(on&&state==='idle'){state='run';t0=t;reset();paintSig();try{if(!aud){aud=new Audio(CIERRE_AUDIO);aud.preload='auto'}aud.currentTime=0;aud.volume=0;aud.play().catch(()=>{})}catch(e){}}
     if(!on&&state!=='idle'){if(!offAt)offAt=t;if(t-offAt>2){state='idle';offAt=0;reset();if(aud)aud.pause()}}else if(on)offAt=0;
     if(state==='idle')return;
-    if(aud&&!aud.paused){const c=aud.currentTime;if(c>=AUD_END)aud.pause();else aud.volume=Math.max(0,Math.min(1,c/1.2,(AUD_END-c)/AUD_FADE))}
-    let ti=t-t0+off;if(!vidAuto&&state==='run'&&ti>=blocks[blocks.length-1].end){vidAuto=true;playFinalVideo()}window.__blocks=blocks;if(window.__ct!=null)ti=window.__ct;/* atajo de prueba: window.__ct fija el instante del cierre */
+    if(aud&&!aud.paused){const c=aud.currentTime;if(c>=AUD_END)aud.pause();else{aud.volume=Math.max(0,Math.min(1,c/1.2,(AUD_END-c)/AUD_FADE));/* al terminar los textos del final, el sonido se apaga con un fade */if(endT>=0){const kf=Math.max(0,1-(t-endT)/2.5);aud.volume=Math.min(aud.volume,kf);if(kf<=0)aud.pause()}}}
+    let ti=t-t0+off;window.__blocks=blocks;if(window.__ct!=null)ti=window.__ct;{const done=ti>=blocks[blocks.length-1].end;if(done&&endT<0)endT=t;window.__cierreAtEnd=done}/* terminados los textos: con un clic se abre el video final *//* atajo de prueba: window.__ct fija el instante del cierre */
     if(skip){skip=false;const bi=blocks.findIndex(k=>ti<k.end);if(bi>=0&&!blocks[bi].b.final){const k=blocks[bi];off+=ti<k.typeEnd?(k.typeEnd-ti):(k.end-ti);ti=t-t0+off}}
-    const bi=Math.max(0,blocks.findIndex(k=>ti<k.end)),k=blocks[bi<0?blocks.length-1:bi],lt=ti-k.start;window.__cierreAtEnd=!!k.b.final;
+    const bi=Math.max(0,blocks.findIndex(k=>ti<k.end)),k=blocks[bi<0?blocks.length-1:bi],lt=ti-k.start;
     const key=bi+'|'+(lt<k.typeDur+.05?Math.round(lt*30):'x')+'|'+Math.round(Math.min(1,Math.max(0,1-(ti-(k.typeEnd+(k.b.hold||HOLD)))/FADE))*30)+'|'+(Math.floor(t*2)%2)+'|'+(k.b.sign?Math.round((lt-k.typeDur-.5)*30):0);
     if(key!==lastKey){lastKey=key;draw(ti,t);tex.needsUpdate=true}})});
 
