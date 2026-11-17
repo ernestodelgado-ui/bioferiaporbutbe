@@ -771,7 +771,7 @@ window.__seed=(a,b,c,d,e)=>{scrIdx=e===undefined?-1:e;seedStep=a;seedWord=b;catS
 /* "Siguiente" / flecha en el centro: avanza o retrocede un tiempo; cuando ya nació la forma, "Siguiente" pasa a la estación que sigue */
 /* final: después del juego, un clic vuelve al centro con la forma y las luces de las estaciones giran a su alrededor; otro clic lleva al cierre */
 const finEl=document.getElementById('fin');let endScr=false;
-function endOff(){endScr=false;finEl.classList.remove('on')}
+function endOff(){endScr=false;finEl.classList.remove('on');const fb=finEl.querySelector('b');if(fb)fb.textContent='Activemos el cambio'}
 /* después de Gracias: video de la publicidad de Bioferia en pantalla completa (se enciende y se apaga como la tele del inicio); al terminar, el centro con las luces y 'Activemos el cambio' */
 let finalVid=false;
 /* música de fondo, suave: arranca cuando termina el video de Capitán Planeta, sigue en loop por las estaciones y se apaga sola en el juego (y no vuelve en el cierre) */
@@ -802,7 +802,7 @@ function finalOff(){if(!finalVid||fOff)return;fOff=true;if(fsFade){fvv.pause();f
   setTimeout(()=>{fvv.style.display='none';dotEl.classList.add('on')},820);
   setTimeout(()=>{fvEl.style.opacity=0;setTimeout(()=>{fvEl.style.display='none';fvv.removeAttribute('src');fvv.load()},700);setTimeout(()=>dotEl.classList.remove('on'),900);finalVid=false;fOff=false;const dn2=fsDone;fsDone=null;if(dn2)dn2();else showEndScreen()},1500)}
 fvv.addEventListener('ended',finalOff);fvv.addEventListener('error',()=>{if(finalVid)finalOff()});fvSkip.onclick=finalOff;addEventListener('keydown',e=>{if(e.key==='Escape'&&finalVid)finalOff()});
-function showEndScreen(){endScr=true;noCapSeed=true;seqOn=false;seedStep=2;seedWord=-1;catStep=0;elStep=0;seedMergeT0=tNow-10;seedFlameT0=tNow-10;wordEl.classList.remove('on');go(seedIdx);next.textContent='Volver a empezar ↺';setTimeout(()=>{if(endScr&&cur===seedIdx)finEl.classList.add('on')},2200)}
+function showEndScreen(){endScr=true;noCapSeed=true;seqOn=false;seedStep=2;seedWord=-1;catStep=0;elStep=0;seedMergeT0=tNow-10;seedFlameT0=tNow-10;wordEl.classList.remove('on');go(seedIdx);next.textContent='Volver a empezar ↺';const fb=finEl.querySelector('b');fb.textContent='Gracias';/* primero Gracias; después, Activemos el cambio */setTimeout(()=>{if(endScr&&cur===seedIdx)finEl.classList.add('on')},2200);setTimeout(()=>{if(endScr)finEl.classList.remove('on')},6200);setTimeout(()=>{if(endScr&&cur===seedIdx){fb.textContent='Activemos el cambio';finEl.classList.add('on')}},7900)}
 function seedAdvance(dir){if(!started)return false;if(window.__tvOn)return true;
   if(spStep(dir))return true;
   {if(window.__OPEN&&window.__OPEN.on)return true;const D=window.__DESC;if(D&&['born','hold','return','unborn'].includes(D.mode)){if(dir>0){if(D.mode==='hold')D.startScroll();else if(D.mode==='return')D.unborn()}return true}}
@@ -2106,7 +2106,7 @@ function galOpen(n,get,k0,mesh,onK){const src=get(k0);if(!src)return;GAL={n,get,
     pzb.style.transform='translate('+((x0+x1)/2-(r.left+r.width/2))+'px,'+((y0+y1)/2-(r.top+r.height/2))+'px) scale('+sc+')';void pzb.offsetWidth;pzb.style.transition=''}
   pzb.style.transform='none';pz.classList.add('on')}
 const RING_ITEMS=()=>({merch:MERCH_ITEMS,staff:STAFF_ITEMS,senaletica:window.SEN_ITEMS||[],campanas:window.CMP_ITEMS||[]});
-function openMg(i,id){id=id||(cur>=0&&ST[cur]&&ST[cur].id);const L=RING_ITEMS()[id],h=RINGS[id]&&RINGS[id][i];if(!L||!h)return;galOpen(L.length,k=>typeof L[k].src==='function'?L[k].src():L[k].src,i,h.m)}
+function openMg(i,id){id=id||(cur>=0&&ST[cur]&&ST[cur].id);if(id==='campanas'&&i===0){/* Campañas: el primer afiche abre el video a pantalla completa; al terminar se sigue con el resto */if(!finalVid)playFS('media/campana-video.mp4',()=>{},{bg:'#000',fade:true});return}const L=RING_ITEMS()[id],h=RINGS[id]&&RINGS[id][i];if(!L||!h)return;galOpen(L.length,k=>typeof L[k].src==='function'?L[k].src():L[k].src,i,h.m)}
 window.__mg=openMg;
 let mgDn=null;cv.addEventListener('pointerdown',e=>{mgDn={x:e.clientX,y:e.clientY}});
 cv.addEventListener('pointerup',e=>{if(!mgDn||Math.hypot(e.clientX-mgDn.x,e.clientY-mgDn.y)>6||cur<0||!ST[cur]||!RINGS[ST[cur].id]||pz.classList.contains('on'))return;const h=rayAt(e,RINGS[ST[cur].id].map(o=>o.m));if(h.length)openMg(h[0].object.userData.mg)});
