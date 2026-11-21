@@ -1468,7 +1468,7 @@ window.SEN_ITEMS=['Cafetería','Baño','Accesibilidad','Informes','Información'
 station({id:'senaletica',az:D(100),R:27,y:.4,title:'Señalética',text:'El sistema de soportes: madera y acrílico con cada pictograma impreso.'+String.fromCharCode(92)+'nTocá uno para verlo en grande.',cam:{r:9.5,ph:.06}},g=>modelRing(g,'senaletica',window.SEN_ITEMS,{src:'assets/pictos/soporte.webp',aspect:1024/1536,trim:true,MH:5.6,sw:2.6,RX:5.6,cw:2.3,ry:-1.2}));
 
 /* CAMPAÑAS: los afiches de la campaña uno al lado del otro; al tocar uno se viene al frente, grande, y con las flechas se pasa de a uno */
-window.CMP_ITEMS=[1,2,4,3,5,6].map(n=>({n:'Campaña '+n,src:'assets/campana/c'+n+'.jpg'}));
+window.CMP_ITEMS=[1,2,3,4,5,6].map(n=>({n:'Campaña '+n,src:'assets/campana/c'+n+'.jpg'}));
 station({id:'campanas',az:D(165),R:27,y:.2,title:'Campañas',text:'Los afiches de la campaña Activemos el cambio. Tocá uno para traerlo al frente y pasá de a uno.',cam:{r:8.2,ph:.05}},g=>{
   const row=new THREE.Group();row.position.y=.2;g.add(row);const cards=RINGS['campanas']=[];const CW=720,CH=1020,PW=2.2,N=CMP_ITEMS.length;
   CMP_ITEMS.forEach((it,i)=>{const cv=canvas(CW,CH),x=cv.getContext('2d'),mat=new THREE.MeshBasicMaterial({map:mkTex(cv),transparent:true,depthWrite:false,side:THREE.DoubleSide,toneMapped:false,fog:false}),m=new THREE.Mesh(new THREE.PlaneGeometry(PW,PW*CH/CW),mat);m.userData.rg='campanas';m.userData.mg=i;m.renderOrder=3;row.add(m);
